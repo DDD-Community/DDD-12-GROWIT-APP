@@ -6,7 +6,7 @@ Apple Developer 콘솔에서 Sign in with Apple을 활성화합니다.
 
 ## 상태
 
-⬜ 대기
+✅ 완료
 
 ## 선행 조건
 
@@ -31,7 +31,7 @@ Apple Developer 콘솔에서 Sign in with Apple을 활성화합니다.
 - **App IDs** 선택
 - **App** 선택
 - Description: `GrowIt Mobile`
-- Bundle ID: `com.growit.mobile` (Explicit)
+- Bundle ID: `com.growitddd.growit-app` (Explicit)
 
 ### 3. Sign in with Apple 활성화
 
@@ -57,35 +57,39 @@ Sign in with Apple 활성화 후 Provisioning Profile 재생성 필요:
 {
   "expo": {
     "ios": {
-      "bundleIdentifier": "com.growit.mobile",
-      "usesAppleSignIn": true,
-      "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true
-      }
+      "bundleIdentifier": "com.growitddd.growit-app",
+      "usesAppleSignIn": true
     }
   }
 }
 ```
 
-### 6. (선택) 서버 검증용 Key 생성
+> `usesAppleSignIn: true` 설정 시 EAS Build가 자동으로 Sign in with Apple entitlement를 추가합니다.
 
-백엔드에서 Identity Token 검증 시 필요:
+### 6. 서버 검증용 Key 생성
+
+백엔드에서 Identity Token을 검증하기 위해 **필수**로 생성해야 합니다.
+
+> 상세 내용은 [Apple Sign in 서버 검증](../../references/2025-02-16-apple-sign-in-서버-검증.md) 참고
 
 1. **Keys** 메뉴 이동
 2. **Create a key** 클릭
 3. Key Name: `GrowIt Sign in with Apple`
 4. **Sign in with Apple** 체크
-5. **Configure** 클릭 → App ID 선택
+5. **Configure** 클릭 → App ID 선택 (`com.growitddd.growit-app`)
 6. **Register** 클릭
 7. Key 파일 다운로드 (`.p8`) - **한 번만 다운로드 가능!**
 
-#### 저장할 정보
+#### 백엔드 전달 정보
 
-| 항목 | 예시 | 용도 |
-|------|------|------|
-| Key ID | `ABC123XYZ` | JWT 헤더의 kid |
-| Team ID | `TEAM123` | JWT 검증 |
-| Key File | `AuthKey_ABC123XYZ.p8` | 서버에서 사용 |
+| 항목 | 예시 | 확인 위치 |
+|------|------|----------|
+| Key ID | `ABC123XYZ` | Keys 목록에서 확인 |
+| Team ID | `TEAM123` | [Membership](https://developer.apple.com/account/#!/membership)에서 확인 |
+| Key File | `AuthKey_ABC123XYZ.p8` | 다운로드한 파일 |
+| Bundle ID | `com.growitddd.growit-app` | app.json에서 확인 |
+
+> **주의**: `.p8` 파일은 1회만 다운로드 가능합니다. 안전한 곳에 백업해두세요.
 
 ## Apple Developer 콘솔 구조
 
@@ -93,7 +97,7 @@ Sign in with Apple 활성화 후 Provisioning Profile 재생성 필요:
 Certificates, Identifiers & Profiles
 ├── Certificates      ← 인증서 (코드 서명)
 ├── Identifiers       ← App ID (Bundle ID)
-│   └── com.growit.mobile
+│   └── com.growitddd.growit-app
 │       └── Capabilities
 │           └── Sign in with Apple ✅
 ├── Profiles          ← Provisioning Profile
@@ -104,20 +108,20 @@ Certificates, Identifiers & Profiles
 
 ### Apple Developer 콘솔
 
-- [ ] App ID 생성 (Bundle ID: `com.growit.mobile`)
-- [ ] Sign in with Apple Capability 활성화
-- [ ] (서버용) Key 생성 및 다운로드
+- [x] App ID 확인 (Bundle ID: `com.growitddd.growit-app`)
+- [x] Sign in with Apple Capability 활성화
+- [x] 서버용 Key 생성 및 다운로드
 
 ### 프로젝트
 
-- [ ] app.json에 `usesAppleSignIn: true` 추가
-- [ ] Bundle ID 일치 확인
+- [x] app.json에 `usesAppleSignIn: true` 추가
+- [x] Bundle ID 일치 확인
 
 ## 완료 조건
 
-- [ ] Apple Developer에서 Sign in with Apple 활성화
-- [ ] app.json 설정 완료
-- [ ] (선택) 서버용 Key 생성
+- [x] Apple Developer에서 Sign in with Apple 활성화
+- [x] app.json 설정 완료
+- [x] 서버용 Key 생성 및 백엔드 전달
 
 ## 주의사항
 
