@@ -8,6 +8,16 @@ EAS (Expo Application Services) 프로젝트를 설정하여 네이티브 빌드
 
 ⬜ 대기
 
+## 사전 지식
+
+이 태스크를 진행하기 전에 다음 문서를 참고하세요:
+
+| 문서 | 내용 |
+|------|------|
+| [EAS Apple 인증과 코드 서명](../../references/2025-02-15-eas-apple-인증과-코드서명.md) | Apple ID vs API Key, 인증서/Provisioning Profile |
+| [EAS 빌드 방식 비교](../../references/2025-02-15-eas-빌드-방식-비교.md) | 클라우드 vs 로컬 빌드 |
+| [Expo 개발 워크플로우](../../references/2025-02-15-expo-개발-워크플로우.md) | 핫 리로드 개발 방식 |
+
 ## 왜 EAS Build가 필요한가?
 
 | 구분 | Expo Go | EAS Build |
@@ -24,7 +34,7 @@ EAS (Expo Application Services) 프로젝트를 설정하여 네이티브 빌드
 ### 1. EAS CLI 설치
 
 ```bash
-npm install -g eas-cli
+yarn global add eas-cli
 ```
 
 ### 2. EAS 로그인
@@ -74,40 +84,7 @@ eas build:configure
 }
 ```
 
-### 5. Development Build 생성
-
-#### iOS 시뮬레이터용
-
-```bash
-eas build --profile development --platform ios
-```
-
-#### iOS 실제 기기용
-
-```bash
-eas build --profile development --platform ios --device
-```
-
-> 실제 기기 테스트를 위해서는 Apple Developer 계정이 필요합니다.
-
-### 6. Development Build 설치
-
-빌드 완료 후:
-
-```bash
-# 시뮬레이터에 설치
-eas build:run --platform ios
-
-# 또는 QR 코드로 실제 기기에 설치
-```
-
-### 7. 개발 서버 실행
-
-```bash
-npx expo start --dev-client
-```
-
-## app.json 설정 추가
+### 5. app.json 설정 추가
 
 ```json
 {
@@ -131,13 +108,42 @@ npx expo start --dev-client
 }
 ```
 
-## 빌드 프로필 설명
+### 6. Development Build 생성
 
-| 프로필 | 용도 | 특징 |
-|--------|------|------|
-| `development` | 개발 중 테스트 | 개발 클라이언트, 핫 리로드 |
-| `preview` | 내부 테스트 배포 | 프로덕션 유사, 내부 배포 |
-| `production` | 스토어 배포 | 최적화, 서명 포함 |
+#### iOS 시뮬레이터용 (클라우드)
+
+```bash
+eas build --profile development --platform ios
+```
+
+#### iOS 시뮬레이터용 (로컬 - Mac에서 더 빠름)
+
+```bash
+eas build --profile development --platform ios --local
+```
+
+> 첫 빌드 시 Apple Developer 계정 연결이 필요합니다. [EAS Apple 인증과 코드 서명](../../references/2025-02-15-eas-apple-인증과-코드서명.md) 참고.
+
+### 7. Development Build 설치
+
+빌드 완료 후:
+
+```bash
+# 시뮬레이터에 설치
+eas build:run --platform ios
+
+# 또는 QR 코드로 실제 기기에 설치
+```
+
+### 8. 개발 서버 실행 및 연결
+
+```bash
+npx expo start --dev-client
+```
+
+시뮬레이터에서 앱을 열면 개발 서버에 자동 연결됩니다. 이후 코드 수정 시 핫 리로드로 즉시 반영됩니다.
+
+> 개발 워크플로우 상세 내용은 [Expo 개발 워크플로우](../../references/2025-02-15-expo-개발-워크플로우.md) 참고.
 
 ## 완료 조건
 
@@ -145,13 +151,15 @@ npx expo start --dev-client
 - [ ] EAS 로그인
 - [ ] EAS 프로젝트 초기화 (`eas init`)
 - [ ] eas.json 생성
+- [ ] Apple Developer 계정 연결
+- [ ] 인증서/프로필 자동 생성 확인
 - [ ] Development Build 생성 (iOS)
 - [ ] 개발 서버 연결 확인
 
 ## 예상 소요 시간
 
 - EAS 설정: 10분
-- iOS 빌드: 15-30분 (EAS 클라우드)
+- iOS 빌드: 5-30분 (로컬 5-10분, 클라우드 15-30분)
 
 ## 참고 자료
 

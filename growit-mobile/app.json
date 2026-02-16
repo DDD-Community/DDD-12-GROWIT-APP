@@ -48,6 +48,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "root": "./src/app"
+      },
+      "eas": {
+        "projectId": "f8f4eb8d-fc22-48bb-8aaa-fe36d96dcd90"
+      }
+    },
+    "owner": "growit-ddd"
   }
 }
