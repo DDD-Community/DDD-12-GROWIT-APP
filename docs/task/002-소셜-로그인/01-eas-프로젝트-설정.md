@@ -6,7 +6,7 @@ EAS (Expo Application Services) 프로젝트를 설정하여 네이티브 빌드
 
 ## 상태
 
-⬜ 대기
+✅ 완료
 
 ## 사전 지식
 
@@ -58,7 +58,7 @@ eas init
 eas build:configure
 ```
 
-생성된 `eas.json`:
+생성된 `eas.json` (예시):
 
 ```json
 {
@@ -84,20 +84,20 @@ eas build:configure
 }
 ```
 
-### 5. app.json 설정 추가
+> 위는 기본 예시이며, 실제 생성되는 설정은 프로젝트에 따라 다를 수 있습니다.
+
+### 5. app.json 설정 확인
+
+EAS 빌드에 필요한 최소 설정:
 
 ```json
 {
   "expo": {
-    "name": "growit-mobile",
-    "slug": "growit-mobile",
-    "version": "1.0.0",
     "ios": {
-      "bundleIdentifier": "com.growit.mobile",
-      "supportsTablet": true
+      "bundleIdentifier": "com.example.app"
     },
     "android": {
-      "package": "com.growit.mobile"
+      "package": "com.example.app"
     },
     "extra": {
       "eas": {
@@ -108,7 +108,19 @@ eas build:configure
 }
 ```
 
-### 6. Development Build 생성
+> 위는 필수 항목 예시입니다. `eas init` 실행 시 `projectId`가 자동으로 설정됩니다. 기존 `app.json`에 이미 설정되어 있다면 이 단계는 건너뜁니다.
+
+### 6. expo-dev-client 설치
+
+Development Build를 생성하려면 `expo-dev-client` 패키지가 필요합니다:
+
+```bash
+yarn add expo-dev-client
+```
+
+> 이 패키지가 없으면 `eas build` 실행 시 오류가 발생합니다.
+
+### 7. Development Build 생성
 
 #### iOS 시뮬레이터용 (클라우드)
 
@@ -124,7 +136,34 @@ eas build --profile development --platform ios --local
 
 > 첫 빌드 시 Apple Developer 계정 연결이 필요합니다. [EAS Apple 인증과 코드 서명](../../references/2025-02-15-eas-apple-인증과-코드서명.md) 참고.
 
-### 7. Development Build 설치
+#### 첫 빌드 시 질문 및 응답
+
+| 질문 | 권장 응답 | 설명 |
+|------|----------|------|
+| Generate a new Apple Distribution Certificate? | **Yes** | EAS가 인증서를 자동 생성/관리 |
+| Would you like to register devices now? | **No** | 시뮬레이터만 사용 시 불필요 |
+
+> **주의**: 첫 빌드는 **interactive 모드**로 실행해야 합니다 (터미널에서 직접 실행). Apple Developer 계정 로그인 및 2FA 인증이 필요합니다.
+
+#### 시뮬레이터 전용 빌드 설정
+
+실제 기기 등록 없이 시뮬레이터에서만 테스트하려면 `eas.json`에 `simulator: true` 설정이 필요합니다:
+
+```json
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    }
+  }
+}
+```
+
+### 8. Development Build 설치
 
 빌드 완료 후:
 
@@ -135,7 +174,7 @@ eas build:run --platform ios
 # 또는 QR 코드로 실제 기기에 설치
 ```
 
-### 8. 개발 서버 실행 및 연결
+### 9. 개발 서버 실행 및 연결
 
 ```bash
 npx expo start --dev-client
@@ -147,14 +186,15 @@ npx expo start --dev-client
 
 ## 완료 조건
 
-- [ ] EAS CLI 설치
-- [ ] EAS 로그인
-- [ ] EAS 프로젝트 초기화 (`eas init`)
-- [ ] eas.json 생성
-- [ ] Apple Developer 계정 연결
-- [ ] 인증서/프로필 자동 생성 확인
-- [ ] Development Build 생성 (iOS)
-- [ ] 개발 서버 연결 확인
+- [x] EAS CLI 설치
+- [x] EAS 로그인
+- [x] EAS 프로젝트 초기화 (`eas init`)
+- [x] eas.json 생성
+- [x] expo-dev-client 설치
+- [x] Apple Developer 계정 연결
+- [x] 인증서/프로필 자동 생성 확인
+- [x] Development Build 생성 (iOS)
+- [x] 개발 서버 연결 확인
 
 ## 예상 소요 시간
 

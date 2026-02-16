@@ -14,7 +14,7 @@ Apple 로그인과 Kakao 로그인을 구현하고, WebView와 토큰을 연동�
 
 | 순서 | 태스크 | 상태 | 설명 |
 |------|--------|------|------|
-| 01 | [EAS 프로젝트 설정](./01-eas-프로젝트-설정.md) | ⬜ 대기 | EAS Build 설정 |
+| 01 | [EAS 프로젝트 설정](./01-eas-프로젝트-설정.md) | ✅ 완료 | EAS Build 설정 |
 | 02 | [Apple Developer 설정](./02-apple-developer-설정.md) | ⬜ 대기 | Apple 개발자 콘솔 설정 |
 | 03 | [Apple 로그인 구현](./03-apple-로그인-구현.md) | ⬜ 대기 | expo-apple-authentication |
 | 04 | [토큰 관리 (SecureStore)](./04-토큰-관리.md) | ⬜ 대기 | 토큰 저장/조회/삭제 |

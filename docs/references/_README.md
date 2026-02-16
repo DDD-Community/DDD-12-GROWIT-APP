@@ -46,3 +46,4 @@
 | 2025-02-15 | [EAS Apple 인증과 코드 서명](./2025-02-15-eas-apple-인증과-코드서명.md) | Apple ID vs API Key, 인증서/Provisioning Profile |
 | 2025-02-15 | [EAS 빌드 방식 비교](./2025-02-15-eas-빌드-방식-비교.md) | 클라우드 vs 로컬 빌드 비교 |
 | 2025-02-15 | [Expo 개발 워크플로우](./2025-02-15-expo-개발-워크플로우.md) | 빌드 vs 핫 리로드 개발 방식 |
+| 2025-02-16 | [iOS Bundle Identifier](./2025-02-16-ios-bundle-identifier.md) | Bundle Identifier 개념, 명명 규칙, EAS 설정 |
