@@ -1,8 +1,11 @@
-# 07. 카카오 로그인 구현
+# 04. 카카오 로그인 구현
 
 ## 목표
 
-`@react-native-seoul/kakao-login`을 사용하여 카카오 로그인을 구현합니다.
+`@react-native-seoul/kakao-login`을 사용하여 카카오 로그인 SDK를 연동합니다.
+
+> **현재 범위**: SDK를 통해 ID Token과 사용자 정보를 가져오는 것까지 구현합니다.
+> 백엔드 API 연동은 API가 준비된 후 07-로그인-플로우-통합에서 진행합니다.
 
 ## 상태
 
@@ -12,6 +15,24 @@
 
 - [x] 01-eas-프로젝트-설정 완료
 - [ ] 카카오 개발자 설정 완료 (아래 참조)
+
+## 폴더 구조
+
+```
+growit-mobile/src/
+├── app/
+│   ├── (auth)/
+│   │   ├── _layout.tsx
+│   │   └── Login.tsx          # 로그인 화면
+│   └── _layout.tsx
+├── components/
+│   └── KakaoLoginButton.tsx   # 카카오 로그인 버튼
+└── lib/
+    └── auth/
+        ├── AppleAuth.ts       # Apple 로그인 (이전 태스크)
+        ├── KakaoAuth.ts       # 카카오 로그인 함수
+        └── index.ts
+```
 
 ## 카카오 개발자 설정
 
@@ -127,9 +148,9 @@ yarn add @react-native-seoul/kakao-login
 
 > **주의**: `YOUR_NATIVE_APP_KEY`를 실제 네이티브 앱 키로 교체하세요.
 
-### 3. 카카오 로그인 서비스 구현
+### 3. 카카오 로그인 함수 구현
 
-#### src/lib/kakaoAuth.ts
+#### src/lib/auth/KakaoAuth.ts
 
 ```typescript
 import {
@@ -140,7 +161,9 @@ import {
   KakaoProfile,
 } from '@react-native-seoul/kakao-login';
 
-// 카카오 로그인 결과 타입
+/**
+ * 카카오 로그인 결과 타입
+ */
 export interface KakaoLoginResult {
   idToken: string;
   accessToken: string;
@@ -149,7 +172,9 @@ export interface KakaoLoginResult {
   profileImageUrl: string | null;
 }
 
-// 카카오 로그인 실행
+/**
+ * 카카오 로그인 실행
+ */
 export const signInWithKakao = async (): Promise<KakaoLoginResult> => {
   // 1. 카카오 로그인 (ID Token 포함)
   const token: KakaoOAuthToken = await login();
@@ -170,7 +195,9 @@ export const signInWithKakao = async (): Promise<KakaoLoginResult> => {
   };
 };
 
-// 카카오 로그아웃
+/**
+ * 카카오 로그아웃
+ */
 export const signOutFromKakao = async (): Promise<void> => {
   try {
     await logout();
@@ -181,70 +208,22 @@ export const signOutFromKakao = async (): Promise<void> => {
 };
 ```
 
-### 4. authApi.ts 업데이트
+### 4. 모듈 Export 업데이트
 
-#### src/lib/authApi.ts
+#### src/lib/auth/index.ts
 
 ```typescript
-import { AppleLoginResult } from './appleAuth';
-import { KakaoLoginResult } from './kakaoAuth';
+export {
+  isAppleLoginAvailable,
+  signInWithApple,
+  type AppleLoginResult,
+} from './AppleAuth';
 
-const API_BASE_URL = 'https://your-api.com';
-
-interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    profileImage?: string;
-  };
-  isNewUser: boolean;
-}
-
-// 소셜 로그인 API (Apple, Kakao 통합)
-export const socialLogin = async (
-  provider: 'apple' | 'kakao',
-  data: AppleLoginResult | KakaoLoginResult
-): Promise<AuthResponse> => {
-  let body: Record<string, unknown>;
-
-  if (provider === 'apple') {
-    const appleData = data as AppleLoginResult;
-    body = {
-      provider,
-      idToken: appleData.identityToken,
-      nonce: appleData.nonce,
-      email: appleData.email,
-      fullName: appleData.fullName,
-    };
-  } else {
-    const kakaoData = data as KakaoLoginResult;
-    body = {
-      provider,
-      idToken: kakaoData.idToken,
-      email: kakaoData.email,
-      nickname: kakaoData.nickname,
-      profileImageUrl: kakaoData.profileImageUrl,
-    };
-  }
-
-  const response = await fetch(`${API_BASE_URL}/api/auth/social`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || '로그인 실패');
-  }
-
-  return response.json();
-};
+export {
+  signInWithKakao,
+  signOutFromKakao,
+  type KakaoLoginResult,
+} from './KakaoAuth';
 ```
 
 ### 5. 카카오 로그인 버튼 컴포넌트
@@ -253,40 +232,28 @@ export const socialLogin = async (
 
 ```typescript
 import { TouchableOpacity, Text, StyleSheet, Alert, View } from 'react-native';
-import { signInWithKakao } from '@lib/kakaoAuth';
-import { socialLogin } from '@lib/authApi';
-import { saveTokens, saveUserInfo } from '@lib/tokenStorage';
+import { signInWithKakao } from '@/lib/auth';
+import type { KakaoLoginResult } from '@/lib/auth';
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (result: KakaoLoginResult) => void;
   onError?: (error: Error) => void;
 }
 
 export const KakaoLoginButton = ({ onSuccess, onError }: Props) => {
   const handleLogin = async () => {
     try {
-      // 1. 카카오 로그인
-      const kakaoResult = await signInWithKakao();
+      const result = await signInWithKakao();
 
-      // 2. 백엔드 API 호출
-      const authResult = await socialLogin('kakao', kakaoResult);
-
-      // 3. 토큰 저장
-      await saveTokens({
-        accessToken: authResult.accessToken,
-        refreshToken: authResult.refreshToken,
+      // TODO: 백엔드 API 연동 후 토큰 전송
+      console.log('카카오 로그인 성공:', {
+        email: result.email,
+        nickname: result.nickname,
+        // idToken은 길어서 일부만 출력
+        idToken: result.idToken.substring(0, 50) + '...',
       });
 
-      // 4. 사용자 정보 저장
-      await saveUserInfo({
-        id: authResult.user.id,
-        email: authResult.user.email,
-        name: authResult.user.name,
-        profileImage: authResult.user.profileImage,
-      });
-
-      // 5. 성공 콜백
-      onSuccess();
+      onSuccess(result);
     } catch (error) {
       if (error instanceof Error) {
         // 사용자가 취소한 경우
@@ -336,71 +303,77 @@ const styles = StyleSheet.create({
 
 ### 6. 로그인 화면 업데이트
 
-#### src/app/(auth)/login.tsx
+#### src/app/(auth)/Login.tsx
 
 ```typescript
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { AppleLoginButton } from '@components/AppleLoginButton';
-import { KakaoLoginButton } from '@components/KakaoLoginButton';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { AppleLoginButton } from '@/components/AppleLoginButton';
+import { KakaoLoginButton } from '@/components/KakaoLoginButton';
+import type { AppleLoginResult, KakaoLoginResult } from '@/lib/auth';
 
 export default function LoginScreen() {
-  const router = useRouter();
+  const handleAppleLoginSuccess = (result: AppleLoginResult) => {
+    // TODO: 백엔드 API 연동 후 처리
+    console.log('Apple 로그인 성공!', result.user);
 
-  const handleLoginSuccess = () => {
-    router.replace('/(main)');
+    Alert.alert(
+      '로그인 성공',
+      `환영합니다${result.fullName?.givenName ? `, ${result.fullName.givenName}님` : ''}!`
+    );
+  };
+
+  const handleKakaoLoginSuccess = (result: KakaoLoginResult) => {
+    // TODO: 백엔드 API 연동 후 처리
+    console.log('카카오 로그인 성공!', result.nickname);
+
+    Alert.alert(
+      '로그인 성공',
+      `환영합니다${result.nickname ? `, ${result.nickname}님` : ''}!`
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* 로고/타이틀 영역 */}
-        <View style={styles.header}>
-          <Text style={styles.title}>GrowIt</Text>
-          <Text style={styles.subtitle}>성장을 위한 첫 걸음</Text>
-        </View>
-
-        {/* 로그인 버튼 영역 */}
-        <View style={styles.loginButtons}>
-          <AppleLoginButton onSuccess={handleLoginSuccess} />
-          <KakaoLoginButton onSuccess={handleLoginSuccess} />
-        </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>로그인</Text>
+      <View style={styles.loginButtons}>
+        <AppleLoginButton onSuccess={handleAppleLoginSuccess} />
+        <KakaoLoginButton onSuccess={handleKakaoLoginSuccess} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 24,
-    paddingBottom: 48,
-  },
-  header: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 48,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#1a1a1a',
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginTop: 8,
+    marginBottom: 40,
   },
   loginButtons: {
     width: '100%',
-    gap: 12,
+    gap: 16,
   },
 });
+```
+
+## 카카오 로그인 결과 데이터
+
+로그인 성공 시 받는 데이터:
+
+```typescript
+{
+  idToken: "eyJraWQiOiJXNldjT0...",    // JWT 토큰 (백엔드 전송용)
+  accessToken: "abc123xyz...",         // 카카오 API 호출용
+  email: "user@example.com",           // 이메일 (동의 시)
+  nickname: "홍길동",                   // 닉네임
+  profileImageUrl: "https://..."       // 프로필 이미지 URL
+}
 ```
 
 ## Apple vs Kakao 로그인 비교
@@ -412,7 +385,6 @@ const styles = StyleSheet.create({
 | 이름 제공 | 최초 로그인 시에만 | 항상 제공 |
 | 이메일 제공 | 최초 로그인 시에만 | 동의 시 항상 제공 |
 | 필수 설정 | Apple Developer | Kakao Developers |
-| Nonce | 필요 (직접 생성) | 불필요 (SDK에서 처리) |
 
 ## 에러 처리
 
@@ -430,10 +402,16 @@ const styles = StyleSheet.create({
 - [ ] OpenID Connect 활성화
 - [ ] @react-native-seoul/kakao-login 설치
 - [ ] app.json 플러그인 설정
-- [ ] kakaoAuth.ts 구현
+- [ ] KakaoAuth.ts 구현
 - [ ] KakaoLoginButton 컴포넌트 구현
 - [ ] 로그인 화면에 버튼 추가
 - [ ] Development Build에서 테스트
+- [ ] 로그인 성공 시 ID Token 확인
+
+## 다음 단계 (백엔드 API 준비 후)
+
+- [ ] 07-로그인-플로우-통합에서 AuthApi.ts 구현 (백엔드 토큰 전송)
+- [ ] 토큰 저장 및 화면 이동 처리
 
 ## 참고 자료
 

@@ -48,3 +48,4 @@
 | 2025-02-15 | [Expo 개발 워크플로우](./2025-02-15-expo-개발-워크플로우.md) | 빌드 vs 핫 리로드 개발 방식 |
 | 2025-02-16 | [iOS Bundle Identifier](./2025-02-16-ios-bundle-identifier.md) | Bundle Identifier 개념, 명명 규칙, EAS 설정 |
 | 2025-02-16 | [Apple Sign in 서버 검증](./2025-02-16-apple-sign-in-서버-검증.md) | .p8 Key, 백엔드 검증 설정 |
+| 2025-02-18 | [소셜 로그인 테스트 전략](./2025-02-18-소셜-로그인-테스트-전략.md) | 테스트 가능한 코드 구조, Mock 전략 |

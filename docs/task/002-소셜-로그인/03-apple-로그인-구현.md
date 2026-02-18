@@ -2,7 +2,10 @@
 
 ## 목표
 
-`expo-apple-authentication`을 사용하여 Apple 로그인을 구현합니다.
+`expo-apple-authentication`을 사용하여 Apple 로그인 SDK를 연동합니다.
+
+> **현재 범위**: SDK를 통해 Identity Token과 사용자 정보를 가져오는 것까지 구현합니다.
+> 백엔드 API 연동은 API가 준비된 후 별도로 진행합니다.
 
 ## 상태
 
@@ -13,47 +16,84 @@
 - [x] 01-eas-프로젝트-설정 완료
 - [x] 02-apple-developer-설정 완료
 
+## 유저 플로우
+
+```mermaid
+flowchart TD
+    subgraph "03-apple-로그인-구현 범위"
+        A[로그인 화면] --> B{Apple 로그인<br/>가능 여부 확인}
+        B -->|불가능| C[버튼 숨김]
+        B -->|가능| D[Apple 로그인 버튼 표시]
+        D --> E[사용자: 버튼 클릭]
+        E --> F[Apple 시스템 UI 표시]
+        F --> G{사용자 인증}
+        G -->|취소| H[아무 동작 없음]
+        G -->|Face ID/비밀번호| I[Apple SDK 로그인 처리]
+        I --> J{Identity Token<br/>반환 여부}
+        J -->|없음| K[에러 Alert 표시]
+        J -->|있음| L[로그인 결과 반환]
+        L --> M[성공 Alert 표시<br/>+ console.log]
+    end
+
+    subgraph "다음 단계 (07-로그인-플로우-통합)"
+        M -.->|TODO| N[백엔드 API 호출]
+        N -.-> O[JWT 토큰 저장]
+        O -.-> P[메인 화면 이동]
+    end
+
+    style A fill:#9f9,stroke:#333
+    style D fill:#9f9,stroke:#333
+    style E fill:#9f9,stroke:#333
+    style F fill:#ff9,stroke:#333
+    style I fill:#9f9,stroke:#333
+    style L fill:#9f9,stroke:#333
+    style M fill:#9f9,stroke:#333
+    style N fill:#ddd,stroke:#999
+    style O fill:#ddd,stroke:#999
+    style P fill:#ddd,stroke:#999
+```
+
+**범례:**
+- 🟢 녹색: 이 태스크에서 구현
+- 🟡 노란색: 네이티브 시스템 UI (Apple 제공)
+- ⬜ 회색: 다음 태스크에서 구현 예정
+
+## 폴더 구조
+
+```
+growit-mobile/src/
+├── app/
+│   ├── (auth)/
+│   │   ├── _layout.tsx
+│   │   └── Login.tsx          # 로그인 화면
+│   └── _layout.tsx
+├── components/
+│   └── AppleLoginButton.tsx   # Apple 로그인 버튼
+└── lib/
+    └── auth/
+        ├── AppleAuth.ts       # Apple 로그인 함수
+        └── index.ts
+```
+
 ## 작업 절차
 
 ### 1. 패키지 설치
 
 ```bash
 cd growit-mobile
-npx expo install expo-apple-authentication expo-crypto
+npx expo install expo-apple-authentication
 ```
 
-- `expo-apple-authentication`: Apple 로그인 SDK
-- `expo-crypto`: Nonce 해시 생성
+### 2. Apple 로그인 함수 구현
 
-### 2. Apple 로그인 서비스 구현
-
-#### src/lib/appleAuth.ts
+#### src/lib/auth/AppleAuth.ts
 
 ```typescript
 import * as AppleAuthentication from 'expo-apple-authentication';
-import * as Crypto from 'expo-crypto';
 
-// Apple 로그인 가능 여부 확인
-export const isAppleAuthAvailable = async (): Promise<boolean> => {
-  return await AppleAuthentication.isAvailableAsync();
-};
-
-// Nonce 생성 (Replay Attack 방지)
-const generateNonce = async (): Promise<{ raw: string; hashed: string }> => {
-  const rawNonce = Array.from(
-    { length: 32 },
-    () => Math.random().toString(36)[2]
-  ).join('');
-
-  const hashedNonce = await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    rawNonce
-  );
-
-  return { raw: rawNonce, hashed: hashedNonce };
-};
-
-// Apple 로그인 결과 타입
+/**
+ * Apple 로그인 결과 타입
+ */
 export interface AppleLoginResult {
   identityToken: string;
   user: string;
@@ -62,21 +102,24 @@ export interface AppleLoginResult {
     givenName: string | null;
     familyName: string | null;
   } | null;
-  nonce: string;
 }
 
-// Apple 로그인 실행
-export const signInWithApple = async (): Promise<AppleLoginResult> => {
-  // Nonce 생성
-  const { raw: rawNonce, hashed: hashedNonce } = await generateNonce();
+/**
+ * Apple 로그인 가능 여부 확인
+ */
+export const isAppleLoginAvailable = (): Promise<boolean> => {
+  return AppleAuthentication.isAvailableAsync();
+};
 
-  // Apple 로그인 요청
+/**
+ * Apple 로그인 실행
+ */
+export const signInWithApple = async (): Promise<AppleLoginResult> => {
   const credential = await AppleAuthentication.signInAsync({
     requestedScopes: [
       AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
       AppleAuthentication.AppleAuthenticationScope.EMAIL,
     ],
-    nonce: hashedNonce,
   });
 
   if (!credential.identityToken) {
@@ -93,57 +136,20 @@ export const signInWithApple = async (): Promise<AppleLoginResult> => {
           familyName: credential.fullName.familyName,
         }
       : null,
-    nonce: rawNonce,
   };
 };
 ```
 
-### 3. 백엔드 API 호출
+### 3. 모듈 Export
 
-#### src/lib/authApi.ts
+#### src/lib/auth/index.ts
 
 ```typescript
-import { AppleLoginResult } from './appleAuth';
-
-const API_BASE_URL = 'https://your-api.com';
-
-interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-  isNewUser: boolean;
-}
-
-// Apple 소셜 로그인 API 호출
-export const socialLogin = async (
-  provider: 'apple' | 'kakao',
-  data: AppleLoginResult
-): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/social`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      provider,
-      idToken: data.identityToken,
-      nonce: data.nonce,
-      email: data.email,
-      fullName: data.fullName,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || '로그인 실패');
-  }
-
-  return response.json();
-};
+export {
+  isAppleLoginAvailable,
+  signInWithApple,
+  type AppleLoginResult,
+} from './AppleAuth';
 ```
 
 ### 4. Apple 로그인 버튼 컴포넌트
@@ -152,14 +158,13 @@ export const socialLogin = async (
 
 ```typescript
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { StyleSheet, View, Text, Alert } from 'react-native';
-import { signInWithApple, isAppleAuthAvailable } from '@lib/appleAuth';
-import { socialLogin } from '@lib/authApi';
-import { saveTokens } from '@lib/tokenStorage';
+import { StyleSheet, View, Alert } from 'react-native';
+import { isAppleLoginAvailable, signInWithApple } from '@/lib/auth';
 import { useEffect, useState } from 'react';
+import type { AppleLoginResult } from '@/lib/auth';
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (result: AppleLoginResult) => void;
   onError?: (error: Error) => void;
 }
 
@@ -167,25 +172,23 @@ export const AppleLoginButton = ({ onSuccess, onError }: Props) => {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    isAppleAuthAvailable().then(setIsAvailable);
+    isAppleLoginAvailable().then(setIsAvailable);
   }, []);
 
   const handleLogin = async () => {
     try {
-      // 1. Apple 로그인
-      const appleResult = await signInWithApple();
+      const result = await signInWithApple();
 
-      // 2. 백엔드 API 호출
-      const authResult = await socialLogin('apple', appleResult);
-
-      // 3. 토큰 저장
-      await saveTokens({
-        accessToken: authResult.accessToken,
-        refreshToken: authResult.refreshToken,
+      // TODO: 백엔드 API 연동 후 토큰 전송
+      console.log('Apple 로그인 성공:', {
+        user: result.user,
+        email: result.email,
+        fullName: result.fullName,
+        // identityToken은 길어서 일부만 출력
+        identityToken: result.identityToken.substring(0, 50) + '...',
       });
 
-      // 4. 성공 콜백
-      onSuccess();
+      onSuccess(result);
     } catch (error) {
       if (error instanceof Error) {
         // 사용자가 취소한 경우
@@ -199,7 +202,7 @@ export const AppleLoginButton = ({ onSuccess, onError }: Props) => {
   };
 
   if (!isAvailable) {
-    return null; // iOS가 아니거나 지원하지 않는 경우 버튼 숨김
+    return null;
   }
 
   return (
@@ -227,28 +230,32 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 5. 로그인 화면에서 사용
+### 5. 로그인 화면 구현
 
-#### src/app/(auth)/login.tsx
+#### src/app/(auth)/Login.tsx
 
 ```typescript
-import { View, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { AppleLoginButton } from '@components/AppleLoginButton';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { AppleLoginButton } from '@/components/AppleLoginButton';
+import type { AppleLoginResult } from '@/lib/auth';
 
 export default function LoginScreen() {
-  const router = useRouter();
+  const handleLoginSuccess = (result: AppleLoginResult) => {
+    // TODO: 백엔드 API 연동 후 처리
+    console.log('로그인 성공!', result.user);
 
-  const handleLoginSuccess = () => {
-    // 로그인 성공 시 메인 화면으로 이동
-    router.replace('/(main)');
+    // 임시: 성공 메시지만 표시
+    Alert.alert(
+      '로그인 성공',
+      `환영합니다${result.fullName?.givenName ? `, ${result.fullName.givenName}님` : ''}!`
+    );
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>로그인</Text>
       <View style={styles.loginButtons}>
         <AppleLoginButton onSuccess={handleLoginSuccess} />
-        {/* Kakao 버튼은 추후 추가 */}
       </View>
     </View>
   );
@@ -261,6 +268,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 40,
+  },
   loginButtons: {
     width: '100%',
     gap: 16,
@@ -268,49 +280,52 @@ const styles = StyleSheet.create({
 });
 ```
 
-## Apple 로그인 주의사항
+## Apple 로그인 결과 데이터
+
+로그인 성공 시 받는 데이터:
+
+```typescript
+{
+  identityToken: "eyJraWQiOiJXNldjT0...",  // JWT 토큰 (백엔드 전송용)
+  user: "001234.abcd1234...",              // Apple User ID (고유 식별자)
+  email: "user@privaterelay.appleid.com",  // 이메일 (첫 로그인만)
+  fullName: {                               // 이름 (첫 로그인만)
+    givenName: "길동",
+    familyName: "홍"
+  }
+}
+```
+
+## 주의사항
 
 ### 최초 로그인 시에만 이름/이메일 제공
 
 ```
-첫 번째 로그인:
-├── identityToken ✅
-├── user (Apple User ID) ✅
-├── email ✅ (또는 Private Relay 이메일)
-└── fullName ✅
-
-두 번째 이후 로그인:
-├── identityToken ✅
-├── user (Apple User ID) ✅
-├── email ❌ (null)
-└── fullName ❌ (null)
+첫 번째 로그인:  email ✅, fullName ✅
+두 번째 이후:    email ❌, fullName ❌
 ```
 
-> **중요**: 첫 로그인 시 반드시 서버에 이름/이메일을 저장해야 합니다.
+> **중요**: 백엔드 연동 시 첫 로그인 데이터를 반드시 저장해야 합니다.
 
 ### 테스트 시 초기화 방법
-
-테스트를 위해 Apple 로그인 정보를 초기화하려면:
 
 1. **설정** → **Apple ID** → **비밀번호 및 보안** → **Apple로 로그인한 앱**
 2. 해당 앱 선택 → **Apple ID 사용 중단**
 
-## 에러 처리
-
-| 에러 코드 | 원인 | 처리 |
-|----------|------|------|
-| `ERR_CANCELED` | 사용자가 취소 | 무시 |
-| `ERR_INVALID_RESPONSE` | Apple 서버 오류 | 재시도 안내 |
-| `ERR_REQUEST_FAILED` | 네트워크 오류 | 네트워크 확인 안내 |
-
 ## 완료 조건
 
 - [ ] expo-apple-authentication 설치
-- [ ] expo-crypto 설치
-- [ ] appleAuth.ts 구현
-- [ ] AppleLoginButton 컴포넌트 구현
-- [ ] 로그인 화면에 버튼 추가
+- [ ] AppleAuth.ts 구현
+- [ ] AppleLoginButton.tsx 구현
+- [ ] Login.tsx 화면 구현
 - [ ] Development Build에서 테스트
+- [ ] 로그인 성공 시 Identity Token 확인
+
+## 다음 단계 (백엔드 API 준비 후)
+
+- [ ] AuthApi.ts 구현 (백엔드 토큰 전송)
+- [ ] TokenStorage.ts 구현 (JWT 저장)
+- [ ] 로그인 성공 후 메인 화면 이동
 
 ## 참고 자료
 

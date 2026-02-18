@@ -16,11 +16,12 @@ Apple 로그인과 Kakao 로그인을 구현하고, WebView와 토큰을 연동�
 |------|--------|------|------|
 | 01 | [EAS 프로젝트 설정](./01-eas-프로젝트-설정.md) | ✅ 완료 | EAS Build 설정 |
 | 02 | [Apple Developer 설정](./02-apple-developer-설정.md) | ✅ 완료 | Apple 개발자 콘솔 설정 |
-| 03 | [Apple 로그인 구현](./03-apple-로그인-구현.md) | ⬜ 대기 | expo-apple-authentication |
-| 04 | [토큰 관리 (SecureStore)](./04-토큰-관리.md) | ⬜ 대기 | 토큰 저장/조회/삭제 |
-| 05 | [WebView 토큰 전달](./05-webview-토큰-전달.md) | ⬜ 대기 | postMessage 구현 |
-| 06 | [로그인 플로우 통합](./06-로그인-플로우-통합.md) | ⬜ 대기 | 라우팅 및 상태 관리 |
-| 07 | [Kakao 로그인 구현](./07-kakao-로그인-구현.md) | ⬜ 대기 | @react-native-seoul/kakao-login |
+| 03 | [Apple 로그인 구현](./03-apple-로그인-구현.md) | ⬜ 대기 | SDK 연동 (Identity Token 획득) |
+| 04 | [Kakao 로그인 구현](./04-kakao-로그인-구현.md) | ⬜ 대기 | SDK 연동 (ID Token 획득) |
+| 05 | [토큰 관리 (SecureStore)](./05-토큰-관리.md) | ⬜ 대기 | 토큰 저장/조회/삭제 |
+| 06 | [WebView 토큰 전달](./06-webview-토큰-전달.md) | ⬜ 대기 | postMessage 구현 |
+| 07 | [로그인 플로우 통합](./07-로그인-플로우-통합.md) | ⬜ 대기 | BE API 연동, 라우팅, 상태 관리 |
+| 08 | [테스트 구현](./08-테스트-구현.md) | ⬜ 대기 | Jest, Testing Library, MSW |
 
 ## 아키텍처
 
@@ -66,3 +67,4 @@ Apple 로그인과 Kakao 로그인을 구현하고, WebView와 토큰을 연동�
 
 - [소셜 로그인 방식 비교](../../references/2025-02-14-social-login-comparison.md)
 - [WebView 토큰 전달 방식](../../references/2025-02-14-webview-토큰-전달방식.md)
+- [소셜 로그인 테스트 전략](../../references/2025-02-18-소셜-로그인-테스트-전략.md)
