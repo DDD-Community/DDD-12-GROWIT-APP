@@ -9,7 +9,7 @@
 
 ## 상태
 
-⬜ 대기
+🔄 진행 중
 
 ## 선행 조건
 
@@ -314,10 +314,10 @@ const styles = StyleSheet.create({
 
 ## 완료 조건
 
-- [ ] expo-apple-authentication 설치
-- [ ] AppleAuth.ts 구현
-- [ ] AppleLoginButton.tsx 구현
-- [ ] Login.tsx 화면 구현
+- [x] expo-apple-authentication 설치
+- [x] AppleAuth.ts 구현
+- [x] AppleLoginButton.tsx 구현
+- [x] Login.tsx 화면 구현
 - [ ] Development Build에서 테스트
 - [ ] 로그인 성공 시 Identity Token 확인
 
