@@ -1,6 +1,7 @@
-export const WEB_URL = 'https://your-web-service.com';
+export const WEB_URL = 'https://devweb.grow-it.me';
+
+export const API_URL = 'https://api.grow-it.me';
 
 export const AUTH_PROVIDERS = {
-  APPLE: 'apple',
   KAKAO: 'kakao',
 } as const;
