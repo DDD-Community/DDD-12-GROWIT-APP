@@ -6,7 +6,7 @@
 
 ## 상태
 
-⬜ 대기
+✅ 완료
 
 ## 선행 조건
 
@@ -413,10 +413,10 @@ interface Window {
 ## 완료 조건
 
 - [x] react-native-webview 설치 (이미 완료)
-- [ ] `src/lib/auth/webviewBridge.ts` 구현
-- [ ] `src/components/AuthenticatedWebView.tsx` 컴포넌트 구현
-- [ ] 메인 화면에 WebView 연동
-- [ ] 웹 사이드 코드 구현 (웹 팀 협업)
+- [x] `src/lib/auth/webviewBridge.ts` 구현
+- [x] `src/components/AuthenticatedWebView.tsx` 컴포넌트 구현
+- [x] 메인 화면에 WebView 연동
+- [x] 웹 사이드 코드 구현 (웹 팀 협업)
 - [ ] 토큰 전달 테스트
 - [ ] 토큰 갱신 동기화 테스트
 
