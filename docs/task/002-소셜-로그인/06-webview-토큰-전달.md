@@ -12,6 +12,30 @@
 
 - [x] 05-토큰-관리 완료
 
+## 현재 프로젝트 상태
+
+### 이미 완료된 항목
+
+- [x] `react-native-webview` 설치됨 (package.json: 13.15.0)
+- [x] `useAuth` hook 구현됨 (`src/lib/auth/useAuth/`)
+
+### 현재 파일 구조
+
+```
+src/lib/auth/
+├── index.ts
+├── AppleAuth.ts
+├── KakaoAuth.ts
+├── auth.ts
+└── useAuth/
+    ├── index.ts          # useAuth hook export (Public API)
+    ├── useAuth.ts
+    ├── tokenStorage.ts   # 내부 전용 (외부 접근 불가)
+    └── tokenUtils.ts     # 내부 전용 (외부 접근 불가)
+```
+
+**중요:** `tokenStorage`는 외부에서 직접 import할 수 없음. `useAuth` hook을 통해 토큰 관리.
+
 ## 선택 이유: postMessage
 
 | 방식 | 보안 | 양방향 통신 | 리로드 필요 |
@@ -44,16 +68,9 @@ interface WebViewMessage {
 
 ## 작업 절차
 
-### 1. 패키지 설치
+### 1. 메시지 타입 정의
 
-```bash
-cd growit-mobile
-npx expo install react-native-webview
-```
-
-### 2. 메시지 타입 정의
-
-#### src/lib/webviewBridge.ts
+#### src/lib/auth/webviewBridge.ts
 
 ```typescript
 // 메시지 타입
@@ -97,7 +114,7 @@ export const parseMessage = (data: string): WebViewMessage | null => {
 };
 ```
 
-### 3. WebView 컴포넌트 구현
+### 2. WebView 컴포넌트 구현
 
 #### src/components/AuthenticatedWebView.tsx
 
@@ -106,13 +123,13 @@ import { useRef, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useRouter } from 'expo-router';
-import { getTokens, saveTokens, clearAll } from '@lib/tokenStorage';
+import { useAuth, type Tokens } from '@/lib/auth/useAuth';
 import {
   MESSAGE_TYPES,
   parseMessage,
   createMessage,
-  TokenPayload,
-} from '@lib/webviewBridge';
+  type TokenPayload,
+} from '@/lib/auth/webviewBridge';
 
 interface Props {
   uri: string;
@@ -121,10 +138,10 @@ interface Props {
 export const AuthenticatedWebView = ({ uri }: Props) => {
   const webViewRef = useRef<WebView>(null);
   const router = useRouter();
+  const { tokens, login, logout, user } = useAuth();
 
   // 웹에 토큰 전달
-  const sendTokensToWeb = useCallback(async () => {
-    const tokens = await getTokens();
+  const sendTokensToWeb = useCallback(() => {
     if (!tokens) return;
 
     const message = createMessage<TokenPayload>(MESSAGE_TYPES.AUTH_TOKEN, {
@@ -132,14 +149,13 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
       refreshToken: tokens.refreshToken,
     });
 
-    // 웹에 메시지 전송
     webViewRef.current?.injectJavaScript(`
       window.dispatchEvent(new MessageEvent('message', {
         data: ${message}
       }));
       true;
     `);
-  }, []);
+  }, [tokens]);
 
   // 웹에서 메시지 수신
   const handleMessage = useCallback(
@@ -149,29 +165,29 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
 
       switch (message.type) {
         case MESSAGE_TYPES.READY:
-          // 웹이 준비되면 토큰 전달
-          await sendTokensToWeb();
+          sendTokensToWeb();
           break;
 
         case MESSAGE_TYPES.TOKEN_REFRESHED:
-          // 웹에서 토큰 갱신됨 → 앱에도 저장
           const payload = message.payload as TokenPayload;
           if (payload?.accessToken && payload?.refreshToken) {
-            await saveTokens({
+            const newTokens: Tokens = {
               accessToken: payload.accessToken,
               refreshToken: payload.refreshToken,
-            });
+            };
+            if (user) {
+              await login(newTokens, user);
+            }
           }
           break;
 
         case MESSAGE_TYPES.LOGOUT:
-          // 로그아웃 요청
-          await clearAll();
+          await logout();
           router.replace('/(auth)/login');
           break;
       }
     },
-    [sendTokensToWeb, router]
+    [sendTokensToWeb, login, logout, user, router],
   );
 
   return (
@@ -180,11 +196,9 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
       source={{ uri }}
       style={styles.webview}
       onMessage={handleMessage}
-      // 보안 설정
       javaScriptEnabled={true}
       domStorageEnabled={true}
       sharedCookiesEnabled={false}
-      // 디버깅 (개발 시에만)
       webviewDebuggingEnabled={__DEV__}
     />
   );
@@ -197,7 +211,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 4. 메인 화면에서 사용
+### 3. 메인 화면에서 사용
 
 #### src/app/(main)/index.tsx
 
@@ -221,7 +235,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 5. 웹 사이드 구현 (수정 필요)
+### 4. 웹 사이드 구현 (웹 팀 협업)
 
 #### 웹 프로젝트에 추가할 코드
 
@@ -398,9 +412,9 @@ interface Window {
 
 ## 완료 조건
 
-- [ ] react-native-webview 설치
-- [ ] webviewBridge.ts 구현
-- [ ] AuthenticatedWebView 컴포넌트 구현
+- [x] react-native-webview 설치 (이미 완료)
+- [ ] `src/lib/auth/webviewBridge.ts` 구현
+- [ ] `src/components/AuthenticatedWebView.tsx` 컴포넌트 구현
 - [ ] 메인 화면에 WebView 연동
 - [ ] 웹 사이드 코드 구현 (웹 팀 협업)
 - [ ] 토큰 전달 테스트

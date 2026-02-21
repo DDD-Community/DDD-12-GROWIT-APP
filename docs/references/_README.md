@@ -49,3 +49,5 @@
 | 2025-02-16 | [iOS Bundle Identifier](./2025-02-16-ios-bundle-identifier.md) | Bundle Identifier 개념, 명명 규칙, EAS 설정 |
 | 2025-02-16 | [Apple Sign in 서버 검증](./2025-02-16-apple-sign-in-서버-검증.md) | .p8 Key, 백엔드 검증 설정 |
 | 2025-02-18 | [소셜 로그인 테스트 전략](./2025-02-18-소셜-로그인-테스트-전략.md) | 테스트 가능한 코드 구조, Mock 전략 |
+| 2025-02-21 | [WebView-App 토큰 플로우](./2025-02-21-webview-app-토큰-플로우.md) | 앱 ↔ WebView 토큰 동기화 시나리오별 처리 |
+| 2025-02-21 | [WebView 앱 환경 토큰 대기](./2025-02-21-webview-앱-환경-토큰-대기.md) | 웹이 앱 환경일 때 토큰 대기 처리 (웹 팀용) |
