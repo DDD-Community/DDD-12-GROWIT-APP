@@ -65,6 +65,10 @@ export const MainWebView = ({ uri }: Props) => {
           await logout();
           router.replace('/(auth)/login');
           break;
+
+        case MESSAGE_TYPES.NAVIGATE_TO_NATIVE_LOGIN:
+          router.replace('/(auth)/login');
+          break;
       }
     },
     [sendTokensToWeb, login, logout, user, router]
