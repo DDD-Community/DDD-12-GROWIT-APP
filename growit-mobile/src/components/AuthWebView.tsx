@@ -49,7 +49,7 @@ export const AuthWebView = ({ uri }: Props) => {
   return (
     <WebView
       ref={webViewRef}
-      incognito={true}
+      // incognito={true}
       source={{ uri }}
       style={styles.webview}
       onMessage={handleMessage}
