@@ -62,6 +62,8 @@ export const AuthWebView = ({ uri }: Props) => {
       sharedCookiesEnabled={false}
       webviewDebuggingEnabled={__DEV__}
       backgroundColor="#0f0f10"
+      bounces={false}
+      overScrollMode="never"
     />
   );
 };
