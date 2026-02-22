@@ -1,12 +1,12 @@
 import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
-import { MainWebView } from '@/components/MainWebView';
+import { AuthWebView } from '@/components/AuthWebView';
 import { WEB_URL } from '@/constants';
 
-export default function MainScreen() {
+export default function SignupScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <MainWebView uri={WEB_URL} />
+      <AuthWebView uri={`${WEB_URL}/signup`} />
     </SafeAreaView>
   );
 }

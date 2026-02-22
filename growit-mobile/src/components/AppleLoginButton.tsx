@@ -1,8 +1,8 @@
-import * as AppleAuthentication from 'expo-apple-authentication';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert, TouchableOpacity, Text } from 'react-native';
 import { isAppleLoginAvailable, signInWithApple } from '@/lib/auth';
 import { useEffect, useState } from 'react';
 import type { AppleLoginResult } from '@/lib/auth';
+import AppleLogo from '@assets/icons/apple-logo.svg';
 
 interface Props {
   onSuccess: (result: AppleLoginResult) => void;
@@ -47,25 +47,34 @@ export const AppleLoginButton = ({ onSuccess, onError }: Props) => {
   }
 
   return (
-    <View style={styles.container}>
-      <AppleAuthentication.AppleAuthenticationButton
-        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-        cornerRadius={8}
-        style={styles.button}
-        onPress={handleLogin}
-      />
-    </View>
+    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <View style={styles.content}>
+        <AppleLogo width={18} height={18} />
+        <Text style={styles.text}>Apple로 로그인</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    alignItems: 'center',
-  },
   button: {
     width: '100%',
-    height: 50,
+    height: 56,
+    backgroundColor: '#000000',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#333333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

@@ -14,7 +14,7 @@ interface Props {
   uri: string;
 }
 
-export const AuthenticatedWebView = ({ uri }: Props) => {
+export const MainWebView = ({ uri }: Props) => {
   const webViewRef = useRef<WebView>(null);
   const router = useRouter();
   const { tokens, login, logout, user } = useAuth();
@@ -79,6 +79,7 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
       domStorageEnabled={true}
       sharedCookiesEnabled={false}
       webviewDebuggingEnabled={__DEV__}
+      backgroundColor="#0f0f10"
     />
   );
 };
@@ -86,5 +87,6 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
 const styles = StyleSheet.create({
   webview: {
     flex: 1,
+    backgroundColor: '#0f0f10',
   },
 });

@@ -4,6 +4,7 @@ export const MESSAGE_TYPES = {
   READY: 'READY',
   TOKEN_REFRESHED: 'TOKEN_REFRESHED',
   LOGOUT: 'LOGOUT',
+  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
 
   // 앱 → 웹
   AUTH_TOKEN: 'AUTH_TOKEN',
@@ -19,6 +20,17 @@ export interface WebViewMessage<T = unknown> {
 export interface TokenPayload {
   accessToken: string;
   refreshToken: string;
+}
+
+export interface LoginSuccessPayload {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    profileImage?: string;
+  };
 }
 
 // 메시지 생성 헬퍼

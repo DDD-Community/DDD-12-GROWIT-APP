@@ -1,6 +1,7 @@
 import { TouchableOpacity, Text, StyleSheet, Alert, View } from 'react-native';
 import { signInWithKakao } from '@/lib/auth';
 import type { KakaoLoginResult } from '@/lib/auth';
+import KakaoLogo from '@assets/icons/kakao-logo.svg';
 
 interface Props {
   onSuccess: (result: KakaoLoginResult) => void;
@@ -33,7 +34,7 @@ export const KakaoLoginButton = ({ onSuccess, onError }: Props) => {
   return (
     <TouchableOpacity style={styles.button} onPress={handleLogin}>
       <View style={styles.content}>
-        <Text style={styles.icon}>💬</Text>
+        <KakaoLogo width={18} height={18} />
         <Text style={styles.text}>카카오 로그인</Text>
       </View>
     </TouchableOpacity>
@@ -43,9 +44,9 @@ export const KakaoLoginButton = ({ onSuccess, onError }: Props) => {
 const styles = StyleSheet.create({
   button: {
     width: '100%',
-    height: 50,
+    height: 56,
     backgroundColor: '#FEE500',
-    borderRadius: 8,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -53,9 +54,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-  },
-  icon: {
-    fontSize: 18,
   },
   text: {
     fontSize: 16,
