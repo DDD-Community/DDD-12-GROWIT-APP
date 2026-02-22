@@ -3,11 +3,7 @@ import { StyleSheet } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useRouter } from 'expo-router';
 import { useAuth, type Tokens, type UserInfo } from '@/lib/auth/useAuth';
-import {
-  MESSAGE_TYPES,
-  parseMessage,
-  type LoginSuccessPayload,
-} from '@/lib/auth/webviewBridge';
+import { MESSAGE_TYPES, parseMessage, type SyncTokenToAppPayload } from '@/lib/auth/webviewBridge';
 
 interface Props {
   uri: string;
@@ -25,8 +21,8 @@ export const AuthWebView = ({ uri }: Props) => {
       if (!message) return;
 
       switch (message.type) {
-        case MESSAGE_TYPES.LOGIN_SUCCESS:
-          const payload = message.payload as LoginSuccessPayload;
+        case MESSAGE_TYPES.SYNC_TOKEN_TO_APP:
+          const payload = message.payload as SyncTokenToAppPayload;
           if (payload?.accessToken && payload?.refreshToken && payload?.user) {
             const tokens: Tokens = {
               accessToken: payload.accessToken,
@@ -61,7 +57,6 @@ export const AuthWebView = ({ uri }: Props) => {
       domStorageEnabled={true}
       sharedCookiesEnabled={false}
       webviewDebuggingEnabled={__DEV__}
-      backgroundColor="#0f0f10"
       bounces={false}
       overScrollMode="never"
     />

@@ -2,12 +2,11 @@
 export const MESSAGE_TYPES = {
   // 웹 → 앱
   READY: 'READY',
-  TOKEN_REFRESHED: 'TOKEN_REFRESHED',
+  SYNC_TOKEN_TO_APP: 'SYNC_TOKEN_TO_APP',
   LOGOUT: 'LOGOUT',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
 
   // 앱 → 웹
-  AUTH_TOKEN: 'AUTH_TOKEN',
+  SYNC_TOKEN_TO_WEB: 'SYNC_TOKEN_TO_WEB',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -17,15 +16,17 @@ export interface WebViewMessage<T = unknown> {
   payload?: T;
 }
 
-export interface TokenPayload {
+// 토큰 동기화 페이로드 (앱 → 웹)
+export interface SyncTokenToWebPayload {
   accessToken: string;
   refreshToken: string;
 }
 
-export interface LoginSuccessPayload {
+// 토큰 동기화 페이로드 (웹 → 앱)
+export interface SyncTokenToAppPayload {
   accessToken: string;
   refreshToken: string;
-  user: {
+  user?: {
     id: string;
     email: string;
     name: string;

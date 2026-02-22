@@ -7,7 +7,8 @@ import {
   MESSAGE_TYPES,
   parseMessage,
   createMessage,
-  type TokenPayload,
+  type SyncTokenToWebPayload,
+  type SyncTokenToAppPayload,
 } from '@/lib/auth/webviewBridge';
 
 interface Props {
@@ -23,7 +24,7 @@ export const MainWebView = ({ uri }: Props) => {
   const sendTokensToWeb = useCallback(() => {
     if (!tokens) return;
 
-    const message = createMessage<TokenPayload>(MESSAGE_TYPES.AUTH_TOKEN, {
+    const message = createMessage<SyncTokenToWebPayload>(MESSAGE_TYPES.SYNC_TOKEN_TO_WEB, {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     });
@@ -47,8 +48,8 @@ export const MainWebView = ({ uri }: Props) => {
           sendTokensToWeb();
           break;
 
-        case MESSAGE_TYPES.TOKEN_REFRESHED:
-          const payload = message.payload as TokenPayload;
+        case MESSAGE_TYPES.SYNC_TOKEN_TO_APP:
+          const payload = message.payload as SyncTokenToAppPayload;
           if (payload?.accessToken && payload?.refreshToken) {
             const newTokens: Tokens = {
               accessToken: payload.accessToken,
@@ -79,7 +80,6 @@ export const MainWebView = ({ uri }: Props) => {
       domStorageEnabled={true}
       sharedCookiesEnabled={false}
       webviewDebuggingEnabled={__DEV__}
-      backgroundColor="#0f0f10"
       bounces={false}
       overScrollMode="never"
     />
