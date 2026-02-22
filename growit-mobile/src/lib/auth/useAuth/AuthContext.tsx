@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { tokenStorage, type Tokens } from './tokenStorage';
 import { tokenUtils } from './tokenUtils';
 
@@ -14,7 +14,9 @@ export interface AuthActions {
   refreshAuth: () => Promise<void>;
 }
 
-export const useAuth = (): AuthState & AuthActions => {
+const AuthContext = createContext<(AuthState & AuthActions) | null>(null);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AuthState>({
     isLoading: true,
     isAuthenticated: false,
@@ -79,10 +81,17 @@ export const useAuth = (): AuthState & AuthActions => {
     }));
   }, []);
 
-  return {
-    ...state,
-    login,
-    logout,
-    refreshAuth,
-  };
+  return (
+    <AuthContext.Provider value={{ ...state, login, logout, refreshAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthState & AuthActions => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
 };

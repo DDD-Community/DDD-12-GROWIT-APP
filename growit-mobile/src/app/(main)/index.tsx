@@ -6,7 +6,7 @@ export default function MainScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <MainWebView uri={WEB_URL} />
+      <MainWebView uri={`${WEB_URL}/home`} />
     </SafeAreaView>
   );
 }

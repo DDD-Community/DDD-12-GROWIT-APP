@@ -18,7 +18,7 @@ interface Props {
 export const MainWebView = ({ uri }: Props) => {
   const webViewRef = useRef<WebView>(null);
   const router = useRouter();
-  const { tokens, login, logout, user } = useAuth();
+  const { tokens, login, logout } = useAuth();
 
   // 웹에 토큰 전달
   const sendTokensToWeb = useCallback(() => {
@@ -43,6 +43,8 @@ export const MainWebView = ({ uri }: Props) => {
       const message = parseMessage(event.nativeEvent.data);
       if (!message) return;
 
+      console.log('message', message);
+
       switch (message.type) {
         case MESSAGE_TYPES.READY:
           sendTokensToWeb();
@@ -55,9 +57,7 @@ export const MainWebView = ({ uri }: Props) => {
               accessToken: payload.accessToken,
               refreshToken: payload.refreshToken,
             };
-            if (user) {
-              await login(newTokens, user);
-            }
+            await login(newTokens);
           }
           break;
 
@@ -71,7 +71,7 @@ export const MainWebView = ({ uri }: Props) => {
           break;
       }
     },
-    [sendTokensToWeb, login, logout, user, router]
+    [sendTokensToWeb, login, logout, router]
   );
 
   return (

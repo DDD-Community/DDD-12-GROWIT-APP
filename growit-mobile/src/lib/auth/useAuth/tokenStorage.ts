@@ -19,6 +19,7 @@ export interface UserInfo {
 }
 
 const saveTokens = async (tokens: Tokens): Promise<void> => {
+  console.log('saveTokens', tokens);
   await Promise.all([
     SecureStore.setItemAsync(StorageKey.AccessToken, tokens.accessToken),
     SecureStore.setItemAsync(StorageKey.RefreshToken, tokens.refreshToken),
@@ -34,10 +35,7 @@ const getRefreshToken = async (): Promise<string | null> => {
 };
 
 const getTokens = async (): Promise<Tokens | null> => {
-  const [accessToken, refreshToken] = await Promise.all([
-    getAccessToken(),
-    getRefreshToken(),
-  ]);
+  const [accessToken, refreshToken] = await Promise.all([getAccessToken(), getRefreshToken()]);
 
   if (!accessToken || !refreshToken) {
     return null;

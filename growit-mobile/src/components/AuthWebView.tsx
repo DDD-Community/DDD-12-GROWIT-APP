@@ -2,7 +2,7 @@ import { useRef, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useRouter } from 'expo-router';
-import { useAuth, type Tokens, type UserInfo } from '@/lib/auth/useAuth';
+import { useAuth, type Tokens } from '@/lib/auth/useAuth';
 import { MESSAGE_TYPES, parseMessage, type SyncTokenToAppPayload } from '@/lib/auth/webviewBridge';
 
 interface Props {
@@ -18,25 +18,20 @@ export const AuthWebView = ({ uri }: Props) => {
   const handleMessage = useCallback(
     async (event: WebViewMessageEvent) => {
       const message = parseMessage(event.nativeEvent.data);
+
+      console.log('message', message);
       if (!message) return;
 
       switch (message.type) {
         case MESSAGE_TYPES.SYNC_TOKEN_TO_APP:
           const payload = message.payload as SyncTokenToAppPayload;
-          if (payload?.accessToken && payload?.refreshToken && payload?.user) {
+          if (payload?.accessToken && payload?.refreshToken) {
             const tokens: Tokens = {
               accessToken: payload.accessToken,
               refreshToken: payload.refreshToken,
             };
-            const user: UserInfo = {
-              id: payload.user.id,
-              email: payload.user.email,
-              name: payload.user.name,
-              profileImage: payload.user.profileImage,
-            };
 
-            // 토큰 및 사용자 정보 저장
-            await login(tokens, user);
+            await login(tokens);
 
             // 메인 화면으로 이동
             router.replace('/(main)');
@@ -54,6 +49,7 @@ export const AuthWebView = ({ uri }: Props) => {
   return (
     <WebView
       ref={webViewRef}
+      incognito={true}
       source={{ uri }}
       style={styles.webview}
       onMessage={handleMessage}
