@@ -13,7 +13,7 @@ const decodeJWT = (token: string): JWTPayload | null => {
       atob(base64)
         .split('')
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
+        .join('')
     );
     return JSON.parse(jsonPayload);
   } catch {
@@ -21,6 +21,10 @@ const decodeJWT = (token: string): JWTPayload | null => {
   }
 };
 
+/**
+ * // TODO: 토큰의 만료여부의 기준이, 내부토큰정책과 맞지 않는 것으로 보임
+ * @error 현재 사용하지 말것
+ */
 const isTokenExpired = (token: string): boolean => {
   const payload = decodeJWT(token);
   if (!payload || typeof payload.exp !== 'number') {

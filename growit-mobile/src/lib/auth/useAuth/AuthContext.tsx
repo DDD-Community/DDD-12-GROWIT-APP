@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const tokens = await tokenStorage.getTokens();
 
-        if (tokens && !tokenUtils.isTokenExpired(tokens.accessToken)) {
+        if (tokens) {
           setState((prev) => ({
             ...prev,
             isLoading: false,
