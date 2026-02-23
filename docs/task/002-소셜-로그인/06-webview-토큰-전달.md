@@ -138,7 +138,7 @@ interface Props {
 export const AuthenticatedWebView = ({ uri }: Props) => {
   const webViewRef = useRef<WebView>(null);
   const router = useRouter();
-  const { tokens, login, logout, user } = useAuth();
+  const { tokens, login, logout } = useAuth();
 
   // 웹에 토큰 전달
   const sendTokensToWeb = useCallback(() => {
@@ -171,13 +171,10 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
         case MESSAGE_TYPES.TOKEN_REFRESHED:
           const payload = message.payload as TokenPayload;
           if (payload?.accessToken && payload?.refreshToken) {
-            const newTokens: Tokens = {
+            await login({
               accessToken: payload.accessToken,
               refreshToken: payload.refreshToken,
-            };
-            if (user) {
-              await login(newTokens, user);
-            }
+            });
           }
           break;
 
@@ -187,7 +184,7 @@ export const AuthenticatedWebView = ({ uri }: Props) => {
           break;
       }
     },
-    [sendTokensToWeb, login, logout, user, router],
+    [sendTokensToWeb, login, logout, router],
   );
 
   return (

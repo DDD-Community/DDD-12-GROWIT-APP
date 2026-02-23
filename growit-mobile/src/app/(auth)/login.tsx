@@ -3,26 +3,70 @@ import { useRouter } from 'expo-router';
 import { AppleLoginButton } from '@/components/AppleLoginButton';
 import { KakaoLoginButton } from '@/components/KakaoLoginButton';
 import GrowItLogo from '@assets/icons/growit-logo.svg';
-import type { AppleLoginResult, KakaoLoginResult } from '@/lib/auth';
+import { useAuth } from '@/lib/auth/useAuth';
+import { appleLogin, kakaoSocialLogin } from '@/lib/auth';
+import type { AppleLoginResult, KakaoLoginResult, OAuthSignupPayload } from '@/lib/auth';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login, setOAuthSignupData } = useAuth();
 
-  const handleAppleLoginSuccess = (result: AppleLoginResult) => {
-    console.log('Apple 로그인 성공!', result.user);
+  const handleAppleLoginSuccess = async (result: AppleLoginResult) => {
+    try {
+      // 1. 백엔드 API 호출
+      const authResult = await appleLogin(result.identityToken, result.authorizationCode);
+      const { data } = authResult;
 
-    Alert.alert(
-      '로그인 성공',
-      `환영합니다${result.fullName?.givenName ? `, ${result.fullName.givenName}님` : ''}!`
-    );
+      if (data.accessToken && data.refreshToken) {
+        // 기존 회원: 토큰 저장 후 메인으로 이동
+        await login({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        // AuthProvider가 자동으로 메인 화면으로 라우팅
+      } else if (data.registrationToken) {
+        // 신규 회원: WebView 회원가입 페이지로 이동
+        const signupPayload: OAuthSignupPayload = {
+          identityToken: result.identityToken,
+          registrationToken: data.registrationToken,
+          socialLoginType: 'apple',
+        };
+        setOAuthSignupData(signupPayload);
+        router.push('/(auth)/oauth-signup');
+      }
+    } catch (error) {
+      console.error('Apple 로그인 실패:', error);
+      Alert.alert('로그인 실패', '다시 시도해주세요.');
+    }
   };
 
-  const handleKakaoLoginSuccess = (result: KakaoLoginResult) => {
-    console.log('카카오 로그인 성공!', result.nickname);
+  const handleKakaoLoginSuccess = async (result: KakaoLoginResult) => {
+    try {
+      // 1. 백엔드 API 호출
+      const authResult = await kakaoSocialLogin(result.idToken, result.authorizationCode);
+      const { data } = authResult;
 
-    const name = result.nickname;
-    const message = name ? `환영합니다, ${name}님!` : '환영합니다!';
-    Alert.alert('로그인 성공', message);
+      if (data.accessToken && data.refreshToken) {
+        // 기존 회원: 토큰 저장 후 메인으로 이동
+        await login({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        // AuthProvider가 자동으로 메인 화면으로 라우팅
+      } else if (data.registrationToken) {
+        // 신규 회원: WebView 회원가입 페이지로 이동
+        const signupPayload: OAuthSignupPayload = {
+          identityToken: result.idToken,
+          registrationToken: data.registrationToken,
+          socialLoginType: 'kakao',
+        };
+        setOAuthSignupData(signupPayload);
+        router.push('/(auth)/oauth-signup');
+      }
+    } catch (error) {
+      console.error('카카오 로그인 실패:', error);
+      Alert.alert('로그인 실패', '다시 시도해주세요.');
+    }
   };
 
   return (
@@ -52,7 +96,7 @@ export default function LoginScreen() {
 
       {/* 회원가입 링크 */}
       <View style={styles.signupContainer}>
-        <Text style={styles.signupText}>계정이 없으신가요?  </Text>
+        <Text style={styles.signupText}>계정이 없으신가요?</Text>
         <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
           <Text style={styles.signupLink}>회원가입 바로가기</Text>
         </TouchableOpacity>

@@ -1,17 +1,21 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { tokenStorage, type Tokens } from './tokenStorage';
 import { tokenUtils } from './tokenUtils';
+import type { OAuthSignupPayload } from '../webviewBridge';
 
 export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   tokens: Tokens | null;
+  oauthSignupData: OAuthSignupPayload | null;
 }
 
 export interface AuthActions {
   login: (tokens: Tokens) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
+  setOAuthSignupData: (data: OAuthSignupPayload) => void;
+  clearOAuthSignupData: () => void;
 }
 
 const AuthContext = createContext<(AuthState & AuthActions) | null>(null);
@@ -21,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading: true,
     isAuthenticated: false,
     tokens: null,
+    oauthSignupData: null,
   });
 
   useEffect(() => {
@@ -29,25 +34,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const tokens = await tokenStorage.getTokens();
 
         if (tokens && !tokenUtils.isTokenExpired(tokens.accessToken)) {
-          setState({
+          setState((prev) => ({
+            ...prev,
             isLoading: false,
             isAuthenticated: true,
             tokens,
-          });
+          }));
         } else {
           await tokenStorage.clearTokens();
-          setState({
+          setState((prev) => ({
+            ...prev,
             isLoading: false,
             isAuthenticated: false,
             tokens: null,
-          });
+          }));
         }
       } catch {
-        setState({
+        setState((prev) => ({
+          ...prev,
           isLoading: false,
           isAuthenticated: false,
           tokens: null,
-        });
+        }));
       }
     };
 
@@ -56,20 +64,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback(async (tokens: Tokens) => {
     await tokenStorage.saveTokens(tokens);
-    setState({
+    setState((prev) => ({
+      ...prev,
       isLoading: false,
       isAuthenticated: true,
       tokens,
-    });
+      oauthSignupData: null,
+    }));
   }, []);
 
   const logout = useCallback(async () => {
     await tokenStorage.clearTokens();
-    setState({
+    setState((prev) => ({
+      ...prev,
       isLoading: false,
       isAuthenticated: false,
       tokens: null,
-    });
+      oauthSignupData: null,
+    }));
   }, []);
 
   const refreshAuth = useCallback(async () => {
@@ -81,8 +93,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }));
   }, []);
 
+  const setOAuthSignupData = useCallback((data: OAuthSignupPayload) => {
+    setState((prev) => ({
+      ...prev,
+      oauthSignupData: data,
+    }));
+  }, []);
+
+  const clearOAuthSignupData = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      oauthSignupData: null,
+    }));
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, refreshAuth }}>
+    <AuthContext.Provider
+      value={{ ...state, login, logout, refreshAuth, setOAuthSignupData, clearOAuthSignupData }}
+    >
       {children}
     </AuthContext.Provider>
   );

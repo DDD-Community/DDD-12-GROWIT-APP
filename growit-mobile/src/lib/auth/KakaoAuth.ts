@@ -8,6 +8,7 @@ import {
 
 export interface KakaoLoginResult {
   idToken: string;
+  authorizationCode: string;
   accessToken: string;
   email: string | null;
   nickname: string | null;
@@ -25,6 +26,7 @@ export const signInWithKakao = async (): Promise<KakaoLoginResult> => {
 
   return {
     idToken: token.idToken,
+    authorizationCode: token.accessToken, // Kakao SDK는 accessToken을 직접 반환
     accessToken: token.accessToken,
     email: profile.email ?? null,
     nickname: profile.nickname ?? null,

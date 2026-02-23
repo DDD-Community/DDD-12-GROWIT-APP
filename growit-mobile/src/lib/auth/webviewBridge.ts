@@ -8,6 +8,7 @@ export const MESSAGE_TYPES = {
 
   // 앱 → 웹
   SYNC_TOKEN_TO_WEB: 'SYNC_TOKEN_TO_WEB',
+  OAUTH_SIGNUP: 'OAUTH_SIGNUP',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -33,6 +34,13 @@ export interface SyncTokenToAppPayload {
     name: string;
     profileImage?: string;
   };
+}
+
+// OAuth 회원가입 페이로드 (앱 → 웹)
+export interface OAuthSignupPayload {
+  identityToken: string;
+  registrationToken: string;
+  socialLoginType: 'apple' | 'kakao';
 }
 
 // 메시지 생성 헬퍼

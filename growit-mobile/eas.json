@@ -9,13 +9,25 @@
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_WEB_URL": "EXPO_PUBLIC_WEB_URL_DEV",
+        "EXPO_PUBLIC_API_URL": "EXPO_PUBLIC_API_URL_DEV"
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WEB_URL": "EXPO_PUBLIC_WEB_URL_DEV",
+        "EXPO_PUBLIC_API_URL": "EXPO_PUBLIC_API_URL_DEV"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_WEB_URL": "EXPO_PUBLIC_WEB_URL_PROD",
+        "EXPO_PUBLIC_API_URL": "EXPO_PUBLIC_API_URL_PROD"
+      }
     }
   },
   "submit": {

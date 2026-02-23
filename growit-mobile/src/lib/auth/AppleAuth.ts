@@ -5,6 +5,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
  */
 export interface AppleLoginResult {
   identityToken: string;
+  authorizationCode: string;
   user: string;
   email: string | null;
   fullName: {
@@ -35,8 +36,13 @@ export const signInWithApple = async (): Promise<AppleLoginResult> => {
     throw new Error('Apple 로그인 실패: Identity Token이 없습니다.');
   }
 
+  if (!credential.authorizationCode) {
+    throw new Error('Apple 로그인 실패: Authorization Code가 없습니다.');
+  }
+
   return {
     identityToken: credential.identityToken,
+    authorizationCode: credential.authorizationCode,
     user: credential.user,
     email: credential.email,
     fullName: credential.fullName

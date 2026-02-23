@@ -49,7 +49,6 @@ export const AuthWebView = ({ uri }: Props) => {
   return (
     <WebView
       ref={webViewRef}
-      // incognito={true}
       source={{ uri }}
       style={styles.webview}
       onMessage={handleMessage}
@@ -59,6 +58,7 @@ export const AuthWebView = ({ uri }: Props) => {
       webviewDebuggingEnabled={__DEV__}
       bounces={false}
       overScrollMode="never"
+      allowsInlineMediaPlayback={true}
     />
   );
 };
