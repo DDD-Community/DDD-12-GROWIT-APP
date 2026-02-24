@@ -67,7 +67,7 @@ export const MainWebView = ({ uri }: Props) => {
           break;
 
         case MESSAGE_TYPES.NAVIGATE_TO_NATIVE_LOGIN:
-          router.replace('/(auth)/login');
+          router.dismissAll();
           break;
       }
     },

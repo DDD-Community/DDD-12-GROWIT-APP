@@ -69,6 +69,14 @@ export default function LoginScreen() {
     }
   };
 
+  const handleEmailLogin = () => {
+    router.push('/(auth)/email-login');
+  };
+
+  const handleSignup = () => {
+    router.push('/(auth)/signup');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* 로고 영역 */}
@@ -86,10 +94,7 @@ export default function LoginScreen() {
         <AppleLoginButton onSuccess={handleAppleLoginSuccess} />
 
         {/* 이메일 로그인 버튼 */}
-        <TouchableOpacity
-          style={styles.emailButton}
-          onPress={() => router.push('/(auth)/email-login')}
-        >
+        <TouchableOpacity style={styles.emailButton} onPress={handleEmailLogin}>
           <Text style={styles.emailButtonText}>이메일로 로그인</Text>
         </TouchableOpacity>
       </View>
@@ -97,7 +102,7 @@ export default function LoginScreen() {
       {/* 회원가입 링크 */}
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>계정이 없으신가요?</Text>
-        <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
+        <TouchableOpacity onPress={handleSignup}>
           <Text style={styles.signupLink}>회원가입 바로가기</Text>
         </TouchableOpacity>
       </View>

@@ -50,7 +50,7 @@ export default function OAuthSignupScreen() {
       case MESSAGE_TYPES.NAVIGATE_TO_NATIVE_LOGIN:
         // 회원가입 취소
         clearOAuthSignupData();
-        router.back();
+        router.dismissAll();
         break;
     }
   };

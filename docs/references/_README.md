@@ -54,3 +54,5 @@
 | 2025-02-23 | [EAS 환경변수 설정](./2025-02-23-eas-환경변수-설정.md) | EAS Secrets를 활용한 환경별 환경변수 설정 |
 | 2025-02-23 | [Context 기반 인증 상태 관리](./2025-02-23-context-기반-인증-상태-관리.md) | React Context를 활용한 전역 인증 상태 공유 |
 | 2025-02-23 | [WebView 설정 가이드](./2025-02-23-webview-설정-가이드.md) | WebView 이슈 해결 및 설정 방법 |
+| 2025-02-24 | [Expo Router 네비게이션 메서드](./2025-02-24-expo-router-네비게이션-메서드.md) | push, replace, dismiss 등 메서드 비교 및 사용 가이드 |
+| 2025-02-24 | [React Native Safe Area Insets](./2025-02-24-react-native-safe-area-insets.md) | useSafeAreaInsets로 상단/하단 safe area 배경색 다르게 적용 |
