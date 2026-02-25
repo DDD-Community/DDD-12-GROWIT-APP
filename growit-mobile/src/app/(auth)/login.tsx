@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 48,
+    gap: 8
   },
   signupText: {
     color: '#888888',
