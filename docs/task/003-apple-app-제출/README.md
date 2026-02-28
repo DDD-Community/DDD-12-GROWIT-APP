@@ -14,9 +14,9 @@ growit 앱을 Apple App Store에 제출하기 위한 설정 및 준비 작업을
 
 | 순서 | 태스크 | 상태 | 설명 |
 |------|--------|------|------|
-| 01 | [프로덕션 환경변수 설정](./01-프로덕션-환경변수-설정.md) | ⬜ 대기 | EAS Secrets 및 eas.json 설정 |
-| 02 | [EAS Submit 설정](./02-eas-submit-설정.md) | ⬜ 대기 | App Store Connect API Key 설정 |
-| 03 | [App Store Connect 앱 등록](./03-app-store-connect-앱-등록.md) | ⬜ 대기 | 앱 생성 및 메타데이터 입력 |
+| 01 | [프로덕션 환경변수 설정](./01-프로덕션-환경변수-설정.md) | ✅ 완료 | EAS 대시보드 환경변수 및 eas.json 설정 |
+| 02 | [App Store Connect 앱 등록](./02-app-store-connect-앱-등록.md) | ✅ 완료 | 앱 생성 및 메타데이터 입력 |
+| 03 | [EAS Submit 설정](./03-eas-submit-설정.md) | ⬜ 대기 | App Store Connect API Key 설정 |
 | 04 | [스크린샷 준비](./04-스크린샷-준비.md) | ⬜ 대기 | 필수 해상도별 스크린샷 캡처 |
 | 05 | [법적 문서 준비](./05-법적-문서-준비.md) | ⬜ 대기 | 개인정보처리방침, 이용약관 URL |
 | 06 | [프로덕션 빌드 및 제출](./06-프로덕션-빌드-및-제출.md) | ⬜ 대기 | eas build & submit |
@@ -27,7 +27,7 @@ growit 앱을 Apple App Store에 제출하기 위한 설정 및 준비 작업을
 
 | 항목 | 값 | 상태 |
 |------|-----|------|
-| 앱 이름 | `growit` | ✅ |
+| 앱 이름 | `그로잇: AI 데일리 투두앱` | ✅ |
 | Bundle ID | `com.growitddd.growit-app` | ✅ |
 | 버전 | `1.0.0` | ✅ |
 | Apple Sign In | `true` | ✅ |
@@ -51,13 +51,13 @@ growit 앱을 Apple App Store에 제출하기 위한 설정 및 준비 작업을
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  1. 환경변수 설정                                                │
-│     └─ EAS Secrets에 프로덕션 URL 등록                           │
+│     └─ EAS 대시보드에 환경변수 등록                               │
 │                                                                 │
-│  2. EAS Submit 설정                                             │
+│  2. App Store Connect 앱 등록                                   │
+│     └─ 앱 생성, 메타데이터 입력, ascAppId 확인                    │
+│                                                                 │
+│  3. EAS Submit 설정                                             │
 │     └─ App Store Connect API Key 발급 및 설정                    │
-│                                                                 │
-│  3. App Store Connect 앱 등록                                   │
-│     └─ 앱 생성, 메타데이터 입력                                   │
 │                                                                 │
 │  4. 스크린샷 준비                                                │
 │     └─ 6.7", 6.5" 필수 스크린샷 업로드                           │
