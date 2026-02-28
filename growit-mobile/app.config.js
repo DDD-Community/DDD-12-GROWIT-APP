@@ -58,11 +58,7 @@ export default {
         '@react-native-seoul/kakao-login',
         {
           kakaoAppKey: process.env.KAKAO_NATIVE_APP_KEY,
-<<<<<<< Updated upstream
-          kotlinVersion: "2.1.21",
-=======
-          kotlinVersion: '1.9.0',
->>>>>>> Stashed changes
+          kotlinVersion: '2.1.21',
         },
       ],
     ],
