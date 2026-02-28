@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/lib/auth/useAuth';
 import { WEB_URL } from '@/constants';
@@ -62,10 +63,16 @@ export default function OAuthSignupScreen() {
     }
   }, [oauthSignupData, router]);
 
+  const insets = useSafeAreaInsets();
+
   if (!oauthSignupData) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      {/* 상단 safe area */}
+      <View style={[styles.topSafeArea, { height: insets.top }]} />
+      {/* WebView 콘텐츠 */}
       <WebView
         ref={webViewRef}
         source={{ uri: `${WEB_URL}/oauth/app` }}
@@ -74,17 +81,28 @@ export default function OAuthSignupScreen() {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         webviewDebuggingEnabled={__DEV__}
+        bounces={false}
+        overScrollMode="never"
       />
-    </SafeAreaView>
+      {/* 하단 safe area */}
+      <View style={[styles.bottomSafeArea, { height: insets.bottom }]} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#0f0f10',
+  },
+  topSafeArea: {
+    backgroundColor: '#0f0f10',
+  },
+  bottomSafeArea: {
+    backgroundColor: '#0f0f10',
   },
   webview: {
     flex: 1,
+    backgroundColor: '#0f0f10',
   },
 });
