@@ -16,7 +16,7 @@ growit 앱을 Apple App Store에 제출하기 위한 설정 및 준비 작업을
 |------|--------|------|------|
 | 01 | [프로덕션 환경변수 설정](./01-프로덕션-환경변수-설정.md) | ✅ 완료 | EAS 대시보드 환경변수 및 eas.json 설정 |
 | 02 | [App Store Connect 앱 등록](./02-app-store-connect-앱-등록.md) | ✅ 완료 | 앱 생성 및 메타데이터 입력 |
-| 03 | [EAS Submit 설정](./03-eas-submit-설정.md) | ⬜ 대기 | App Store Connect API Key 설정 |
+| 03 | [EAS Submit 설정](./03-eas-submit-설정.md) | ✅ 완료 | App Store Connect API Key 설정 |
 | 04 | [스크린샷 준비](./04-스크린샷-준비.md) | ⬜ 대기 | 필수 해상도별 스크린샷 캡처 |
 | 05 | [법적 문서 준비](./05-법적-문서-준비.md) | ⬜ 대기 | 개인정보처리방침, 이용약관 URL |
 | 06 | [프로덕션 빌드 및 제출](./06-프로덕션-빌드-및-제출.md) | ⬜ 대기 | eas build & submit |

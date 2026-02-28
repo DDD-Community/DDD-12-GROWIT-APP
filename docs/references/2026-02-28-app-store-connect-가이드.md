@@ -116,25 +116,74 @@ EAS Submit을 사용하면 빌드를 App Store Connect에 자동으로 업로드
 
 ### 인증 방식
 
+EAS Submit이 App Store Connect에 빌드를 업로드하려면 **인증**이 필요합니다. Apple은 보안을 위해 일반 Apple ID/비밀번호 로그인을 CLI 도구에서 허용하지 않으므로, 별도의 인증 방식을 설정해야 합니다.
+
+#### API Key가 필요한 이유
+
+| 문제 | 설명 |
+|------|------|
+| **CLI 로그인 불가** | Apple은 보안상 CLI에서 Apple ID 직접 로그인을 차단 |
+| **2FA 자동화 불가** | 2단계 인증은 사용자 상호작용이 필요하여 CI/CD에서 사용 불가 |
+| **자동화 필요** | `eas submit`, `eas build --auto-submit` 등 자동화 명령어 실행 시 인증 필요 |
+
+#### 인증 방식 비교
+
+| 방식 | 장점 | 단점 | 권장 |
+|------|------|------|------|
+| **App Store Connect API Key** | 만료 없음, CI/CD 친화적, 권한 세분화 | 초기 설정 필요 | ✅ 권장 |
+| **App-Specific Password** | 설정 간단 | 만료 가능, 2FA 계정에만 사용 가능 | 임시용 |
+
+---
+
 #### 방법 1: App Store Connect API Key (권장)
 
+API Key는 **만료되지 않고** CI/CD 환경에서 안전하게 사용할 수 있어 권장됩니다.
+
+##### 1단계: API Key 생성
+
+1. [App Store Connect](https://appstoreconnect.apple.com) 접속
+2. **사용자 및 액세스** → **통합** 탭 → **App Store Connect API**
+3. **+** 버튼으로 새 키 생성
+   - 이름: `EAS Submit Key`
+   - 액세스: `App Manager` 또는 `Admin`
+4. 생성된 키 다운로드 (`.p8` 파일)
+   - ⚠️ **한 번만 다운로드 가능** - 안전한 곳에 보관
+5. 다음 정보 기록:
+   - **Issuer ID**: 페이지 상단에 표시 (예: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
+   - **Key ID**: 생성된 키 옆에 표시 (예: `XXXXXXXXXX`)
+
+##### 2단계: EAS Credentials에 등록
+
 ```bash
-# EAS CLI로 API Key 설정
 eas credentials --platform ios
 ```
 
-1. **App Store Connect** → **사용자 및 액세스** → **키**
-2. **App Store Connect API** → **+** 새 키 생성
-3. 권한: `App Manager` 또는 `Admin`
-4. `.p8` 파일 다운로드 (한 번만 가능)
-5. **Issuer ID**, **Key ID** 기록
+프롬프트에서:
+1. `production` 빌드 프로필 선택
+2. **App Store Connect: Manage your API Key** 선택
+3. **Set up your project to use an API Key for EAS Submit** 선택
+4. `.p8` 파일 경로, Issuer ID, Key ID 입력
 
-#### 방법 2: App-Specific Password
+> EAS가 API Key를 안전하게 저장하므로 이후 `eas submit` 실행 시 자동으로 인증됩니다.
+
+---
+
+#### 방법 2: App-Specific Password (대안)
+
+API Key 설정이 어려운 경우 임시로 사용할 수 있습니다.
 
 ```bash
-# Apple ID에서 앱 암호 생성 후 EAS Secret에 등록
+# 1. appleid.apple.com에서 앱 암호 생성
+# 2. EAS Secret에 등록
 eas secret:create --scope project --name EXPO_APPLE_APP_SPECIFIC_PASSWORD --value "xxxx-xxxx-xxxx-xxxx"
 ```
+
+| 단계 | 작업 |
+|------|------|
+| 1 | [appleid.apple.com](https://appleid.apple.com) 접속 |
+| 2 | **로그인 및 보안** → **앱 암호** |
+| 3 | **앱 암호 생성** → 이름: `EAS Submit` |
+| 4 | 생성된 암호를 위 명령어로 등록 |
 
 ### 제출 명령어
 

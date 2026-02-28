@@ -6,14 +6,14 @@ EAS Submit을 통해 App Store Connect에 빌드를 자동으로 제출할 수 �
 
 ## 상태
 
-⬜ 대기
+✅ 완료
 
 ## 선행 조건
 
 - [x] Apple Developer 계정
 - [x] App Store Connect 접근 권한
 - [x] 01-프로덕션-환경변수-설정 완료
-- [ ] 02-app-store-connect-앱-등록 완료 (ascAppId 필요)
+- [x] 02-app-store-connect-앱-등록 완료 (ascAppId 필요)
 
 ---
 
@@ -36,6 +36,8 @@ EAS Submit을 통해 App Store Connect에 빌드를 자동으로 제출할 수 �
 ## Part 2: App Store Connect API Key 생성
 
 > EAS Submit에서 App Store Connect에 접근하기 위한 인증 키입니다.
+>
+> API Key가 필요한 이유와 인증 방식 비교는 [App Store Connect 가이드](../../references/2026-02-28-app-store-connect-가이드.md#인증-방식)를 참고하세요.
 
 ### 2-1. API Key 생성
 
@@ -63,66 +65,23 @@ eas credentials --platform ios
 4. **Set up your project to use an API Key for EAS Submit** 선택
 5. `.p8` 파일 경로, Issuer ID, Key ID 입력
 
----
-
-## Part 3: eas.json 설정
-
-### 3-1. submit 섹션 추가
-
-```json
-{
-  "cli": {
-    "version": ">= 18.0.1",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "simulator": true
-      },
-      "environment": "development"
-    },
-    "preview": {
-      "distribution": "internal",
-      "environment": "preview"
-    },
-    "production": {
-      "autoIncrement": true,
-      "environment": "production"
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "ascAppId": "YOUR_ASC_APP_ID",
-        "appleTeamId": "YOUR_TEAM_ID"
-      }
-    }
-  }
-}
-```
-
-### 3-2. 필드 설명
-
-| 필드 | 설명 | 예시 |
-|------|------|------|
-| `ascAppId` | App Store Connect 앱 ID | `1234567890` |
-| `appleTeamId` | Apple Developer Team ID | `XXXXXXXXXX` |
+> ✅ 이 과정에서 ascAppId, appleTeamId, API Key가 모두 EAS 서버에 저장됩니다.
+> eas.json에 별도로 설정할 필요가 없습니다.
 
 ---
 
-## Part 4: 설정 테스트
+## Part 3: 설정 확인
 
-### 4-1. Dry Run 테스트
+### 3-1. Credentials 확인
 
 ```bash
-# Submit 설정 확인 (실제 제출하지 않음)
-eas submit --platform ios --profile production --dry-run
+# API Key 등록 상태 확인
+eas credentials --platform ios
 ```
 
-### 4-2. 실제 제출 명령어 (나중에 사용)
+**App Store Connect API Key** 항목에 등록된 키 정보가 표시되면 설정 완료입니다.
+
+### 3-2. 제출 명령어 (프로덕션 빌드 완료 후 사용)
 
 ```bash
 # 최신 빌드 제출
@@ -134,35 +93,12 @@ eas build --platform ios --profile production --auto-submit
 
 ---
 
-## 인증 방식 비교
-
-| 방식 | 장점 | 단점 |
-|------|------|------|
-| **App Store Connect API Key** (권장) | 자동화 친화적, 만료 없음 | 초기 설정 필요 |
-| **Apple ID + App-Specific Password** | 간단한 설정 | 2FA 필요, 만료 가능성 |
-
-### (대안) App-Specific Password 방식
-
-API Key 대신 사용할 경우:
-
-1. [appleid.apple.com](https://appleid.apple.com) 접속
-2. **로그인 및 보안** → **앱 암호**
-3. **앱 암호 생성** → 이름: `EAS Submit`
-4. 생성된 암호를 EAS Secret에 등록:
-
-```bash
-eas secret:create --scope project --name EXPO_APPLE_APP_SPECIFIC_PASSWORD --value "xxxx-xxxx-xxxx-xxxx"
-```
-
----
-
 ## 완료 조건
 
-- [ ] App Store Connect API Key 생성 (`.p8` 파일 보관)
-- [ ] Issuer ID, Key ID 기록
-- [ ] `eas credentials`로 API Key 등록
-- [ ] eas.json `submit` 섹션 설정 완료
-- [ ] `eas submit --dry-run` 테스트 성공
+- [x] App Store Connect API Key 생성 (`.p8` 파일 보관)
+- [x] Issuer ID, Key ID 기록
+- [x] `eas credentials`로 API Key 등록 (ascAppId, appleTeamId 포함)
+- [x] `eas credentials --platform ios`로 등록 확인
 
 ---
 
