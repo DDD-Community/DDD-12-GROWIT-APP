@@ -135,17 +135,18 @@ export async function appleLogin(
 
 /**
  * Kakao 소셜 로그인 API 호출
- * - Kakao SDK에서 받은 idToken, authorizationCode를 백엔드로 전송
- * - 백엔드에서 토큰 검증 후 JWT 발급
+ * - Kakao SDK에서 받은 idToken, refreshToken, nonce를 백엔드로 전송
+ * - 백엔드에서 idToken + nonce 검증 후 JWT 발급
  */
 export async function kakaoSocialLogin(
   idToken: string,
-  authorizationCode: string
+  refreshToken: string,
+  nonce: string
 ): Promise<SocialLoginResponse> {
   const res = await fetch(`${API_URL}/auth/signin/kakao`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken, authorizationCode }),
+    body: JSON.stringify({ idToken, refreshToken, nonce }),
   });
 
   if (!res.ok) {

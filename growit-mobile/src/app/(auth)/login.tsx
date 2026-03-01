@@ -42,8 +42,8 @@ export default function LoginScreen() {
 
   const handleKakaoLoginSuccess = async (result: KakaoLoginResult) => {
     try {
-      // 1. 백엔드 API 호출
-      const authResult = await kakaoSocialLogin(result.idToken, result.authorizationCode);
+      // 1. 백엔드 API 호출 (idToken, refreshToken, nonce 전달)
+      const authResult = await kakaoSocialLogin(result.idToken, result.refreshToken, result.nonce);
       const { data } = authResult;
 
       if (data.accessToken && data.refreshToken) {
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 48,
-    gap: 8
+    gap: 8,
   },
   signupText: {
     color: '#888888',
