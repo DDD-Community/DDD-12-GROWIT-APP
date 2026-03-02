@@ -1,6 +1,6 @@
 export default {
   expo: {
-    name: 'growit',
+    name: 'Growit',
     slug: 'growit-mobile',
     version: '1.0.0',
     orientation: 'portrait',
