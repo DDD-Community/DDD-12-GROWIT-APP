@@ -36,7 +36,8 @@ export default function LoginScreen() {
       }
     } catch (error) {
       console.error('Apple 로그인 실패:', error);
-      Alert.alert('로그인 실패', '다시 시도해주세요.');
+      const message = error instanceof Error ? error.message : '다시 시도해주세요.';
+      Alert.alert('로그인 실패', message);
     }
   };
 
@@ -65,7 +66,8 @@ export default function LoginScreen() {
       }
     } catch (error) {
       console.error('카카오 로그인 실패:', error);
-      Alert.alert('로그인 실패', '다시 시도해주세요.');
+      const message = error instanceof Error ? error.message : '다시 시도해주세요.';
+      Alert.alert('로그인 실패', message);
     }
   };
 

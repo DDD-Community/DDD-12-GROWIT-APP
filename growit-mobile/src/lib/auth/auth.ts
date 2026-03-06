@@ -1,4 +1,5 @@
 import { API_URL } from '@/constants';
+import { handleApiError } from '@/lib/api/error';
 
 export interface AuthToken {
   accessToken: string;
@@ -32,7 +33,9 @@ export async function loginWithEmail(email: string, password: string): Promise<A
     body: JSON.stringify({ email, password }),
   });
 
-  if (!res.ok) throw new Error('로그인에 실패했습니다.');
+  if (!res.ok) {
+    await handleApiError(res, '로그인에 실패했습니다.');
+  }
 
   const json = await res.json();
   return json.data;
@@ -53,7 +56,9 @@ export async function signUp(form: SignupFormData): Promise<void> {
     }),
   });
 
-  if (!res.ok) throw new Error('회원가입에 실패했습니다.');
+  if (!res.ok) {
+    await handleApiError(res, '회원가입에 실패했습니다.');
+  }
 }
 
 export async function kakaoSignUp(
@@ -75,7 +80,9 @@ export async function kakaoSignUp(
     }),
   });
 
-  if (!res.ok) throw new Error('카카오 회원가입에 실패했습니다.');
+  if (!res.ok) {
+    await handleApiError(res, '카카오 회원가입에 실패했습니다.');
+  }
 }
 
 export async function refreshAccessToken(refreshToken: string): Promise<AuthToken> {
@@ -85,7 +92,9 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthToke
     body: JSON.stringify({ refreshToken }),
   });
 
-  if (!res.ok) throw new Error('토큰 갱신에 실패했습니다.');
+  if (!res.ok) {
+    await handleApiError(res, '토큰 갱신에 실패했습니다.');
+  }
 
   const json = await res.json();
   return json.data;
@@ -126,8 +135,7 @@ export async function appleLogin(
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || 'Apple 로그인에 실패했습니다.');
+    await handleApiError(res, 'Apple 로그인에 실패했습니다.');
   }
 
   return res.json();
@@ -150,8 +158,7 @@ export async function kakaoSocialLogin(
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || '카카오 로그인에 실패했습니다.');
+    await handleApiError(res, '카카오 로그인에 실패했습니다.');
   }
 
   return res.json();
