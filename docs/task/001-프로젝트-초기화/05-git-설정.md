@@ -6,7 +6,7 @@
 
 ## 상태
 
-⬜ 대기
+✅ 완료
 
 ## Git 저장소 구조
 
@@ -152,10 +152,10 @@ git push -u origin main
 
 ## 완료 조건
 
-- [ ] growit-mobile/.git 삭제 완료
-- [ ] 루트에서 Git 저장소 초기화 완료
-- [ ] .gitignore 파일 생성
-- [ ] 초기 커밋 완료
+- [x] growit-mobile/.git 삭제 완료
+- [x] 루트에서 Git 저장소 초기화 완료
+- [x] .gitignore 파일 생성
+- [x] 초기 커밋 완료
 - [ ] (선택) 원격 저장소 연결
 
 ## 참고 자료
