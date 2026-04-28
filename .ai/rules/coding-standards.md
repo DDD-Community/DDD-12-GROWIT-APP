@@ -1,0 +1,159 @@
+# APP 코딩 컨벤션 & 스타일 가이드
+
+## Prettier
+
+```json
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "jsxSingleQuote": false
+}
+```
+
+---
+
+## ESLint
+
+- ESLint 9 flat config (`eslint.config.js`)
+- extends: `expo`, `prettier`
+- `prettier/prettier: error` (Prettier 규칙 강제)
+
+---
+
+## TypeScript
+
+- Strict mode 활성화
+- Path aliases:
+  - `@/*` → `./src/*`
+  - `@components/*` → `./src/components/*`
+  - `@lib/*` → `./src/lib/*`
+  - `@constants/*` → `./src/constants/*`
+  - `@assets/*` → `./assets/*`
+
+---
+
+## 파일 네이밍
+
+| 유형 | 규칙 | 예시 |
+|------|------|------|
+| 컴포넌트 | PascalCase 또는 kebab-case | `ThemedText.tsx`, `haptic-tab.tsx` |
+| 훅 | camelCase + `use` 접두사 | `useAuth.ts`, `use-color-scheme.ts` |
+| 유틸리티 | camelCase | `auth.ts` |
+| 상수 | camelCase (파일) | `theme.ts` |
+| 라우트 | kebab-case | `(tabs)/index.tsx` |
+| Platform-specific | `.ios.tsx`, `.android.tsx` | `icon-symbol.ios.tsx` |
+
+---
+
+## 컴포넌트 규칙
+
+### Do
+
+- 함수 컴포넌트 + `export function` 또는 `export default function`
+- Props 타입은 컴포넌트 파일 상단에 `type` 또는 `interface`로 정의
+- `StyleSheet.create()`로 스타일 정의 (컴포넌트 파일 하단)
+- 테마 인식 컴포넌트: `ThemedText`, `ThemedView` 활용
+- `useThemeColor()` 훅으로 동적 테마 색상 적용
+
+### Don't
+
+- `React.FC` 사용 금지
+- `class` 컴포넌트 사용 금지
+- 과도한 인라인 스타일 금지 — `StyleSheet.create()` 사용
+- `any` 타입 사용 금지
+- `react-navigation` 직접 import 금지 — `expo-router`의 `Link`, `useRouter` 사용
+
+---
+
+## 스타일링
+
+### StyleSheet.create() 패턴
+
+```typescript
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+});
+```
+
+### 테마 색상
+
+```typescript
+import { useThemeColor } from '@lib/use-theme-color';
+
+const color = useThemeColor({ light: '#000', dark: '#fff' }, 'text');
+```
+
+### 스타일 규칙
+
+- `StyleSheet.create()`를 컴포넌트 파일 하단에 정의
+- 색상은 `constants/theme.ts`의 Colors 사용
+- 테마 인식이 필요한 곳은 `useThemeColor()` 훅 사용
+- 하드코딩 색상값 최소화
+
+---
+
+## 네비게이션
+
+### Expo Router 사용
+
+```typescript
+import { Link, useRouter } from 'expo-router';
+
+// 선언적 네비게이션
+<Link href="/modal">Open Modal</Link>
+
+// 명령적 네비게이션
+const router = useRouter();
+router.push('/modal');
+router.back();
+```
+
+### 라우트 파라미터
+
+```typescript
+// src/app/[id].tsx
+import { useLocalSearchParams } from 'expo-router';
+
+export default function DetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  // ...
+}
+```
+
+---
+
+## 애니메이션
+
+### React Native Reanimated
+
+```typescript
+import Animated, { useAnimatedStyle, interpolate } from 'react-native-reanimated';
+
+const animatedStyle = useAnimatedStyle(() => ({
+  opacity: interpolate(scrollOffset.value, [0, 100], [1, 0]),
+}));
+```
+
+- `react-native-reanimated` 사용 (Worklet 기반)
+- Shared Values + useAnimatedStyle 패턴
+- 성능: UI 스레드에서 실행
+
+---
+
+## 커밋 규칙
+
+- 커밋 메시지는 **영어**, conventional commit 형식
+- `git add`는 파일 지정 (`-A`, `.` 금지)
+- 타입: `feat:`, `fix:`, `refactor:`, `style:`, `chore:`, `docs:`, `test:`
